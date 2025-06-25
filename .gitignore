@@ -1,0 +1,30 @@
+# Ignore IDE settings
+.idea/
+*.iml
+*.iws
+
+# Ignore build files
+target/
+build/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+
+# Ignore environment and config files
+.env
+application.properties
+application.yml
+**/src/main/resources/application.properties
+**/src/main/resources/application.yml
+
+# Ignore test reports
+*.exec
+*.out
+*.coverage
+
+# Ignore other runtime/generated files
+hs_err_pid*
