@@ -59,7 +59,19 @@ public class Field {
     @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
-    public Field() {}
+    //Constructors
+    public Field() {
+
+    }
+
+    public Field(String name, String city, String address, String phone, String email, Boolean isFree) {
+        this.name = name;
+        this.city = city;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+        this.isFree = isFree;
+    }
 
     //Setter and Getter
 
