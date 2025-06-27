@@ -15,16 +15,29 @@ public class Field {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
     private String description;
+
+    @Column(nullable = false)
     private String city;
+
+    @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false)
     private String phone;
+
+    @Column(nullable = false)
     private String email;
+
     private String website;
     private boolean canShower;
     private boolean hasParking;
     private boolean hasLighting;
+
+    @Column(nullable = false)
     private boolean isFree;
     private LocalTime openingTime;
     private LocalTime lunchBrakeStart;
