@@ -4,6 +4,7 @@ package com.fl.authenticationservice.service;
 import com.fl.authenticationservice.dto.RegisterRequest;
 import com.fl.authenticationservice.entity.User;
 import com.fl.authenticationservice.jwt.JWTService;
+import com.fl.authenticationservice.repository.CityRepository;
 import com.fl.authenticationservice.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,14 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CityRepository cityRepository;
     private final JWTService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JWTService jwtService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JWTService jwtService, CityRepository cityRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.cityRepository = cityRepository;
     }
 
     /*
@@ -38,6 +41,19 @@ public class AuthService {
         Save the new user in the DB and generate a new JWT token for this user (return it)
      */
     public String register(RegisterRequest request) {
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Username is already in use");
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        if (!cityRepository.existsByName(request.getCity())) {
+        throw new IllegalArgumentException("City not supported.");
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -49,6 +65,4 @@ public class AuthService {
         return jwtService.generateToken(user);
 
     }
-
-
 }

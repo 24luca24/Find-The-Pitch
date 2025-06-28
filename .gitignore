@@ -26,5 +26,9 @@ application.yml
 *.out
 *.coverage
 
+# Ignore file of cities
+file(csv)/gi_comuni_cap.csv
+gi_comuni_cleaned.csv
+
 # Ignore other runtime/generated files
 hs_err_pid*

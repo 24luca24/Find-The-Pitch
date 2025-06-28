@@ -1,13 +1,27 @@
 package com.fl.authenticationservice.dto;
 
 import com.fl.authenticationservice.enumTypes.Role;
+import jakarta.validation.constraints.*;
 
 public class RegisterRequest {
 
+    @NotBlank
+    @Size(min=3, max = 30)
     private String username;
+
+    @NotBlank
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[-_])(?=.*\\d).{8,}$",
+            message = "Password must be at least 8 characters, include a number, uppercase letter, and - or _")
     private String password;
+
+    @NotBlank
+    @Email
     private String email;
+
+    @NotBlank
     private Role role;
+
+    @NotBlank
     private String city;
 
     //Constructor
