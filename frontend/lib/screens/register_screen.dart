@@ -1,8 +1,10 @@
 //StatefulWidget -> change because user can type in the fields
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
+
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key})
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -22,10 +24,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => isLoading = true);
 
-      //Call to backend
-      //TODO
+      bool success = await AuthService.register(
+        username: _usernameController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+        city: _cityController.text,
+      );
 
       setState(() => isLoading = false);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Registered successfully!")),
+        );
+        // Optionally navigate
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Registration failed.")),
+        );
+      }
     }
   }
 
