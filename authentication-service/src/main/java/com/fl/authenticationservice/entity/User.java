@@ -4,6 +4,7 @@ import com.fl.authenticationservice.enumTypes.Role;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -19,6 +20,7 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 

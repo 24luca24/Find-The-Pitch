@@ -8,10 +8,18 @@ package com.fl.authenticationservice.controller;
     - Sends a response back to the client
  */
 
+import com.fl.authenticationservice.dto.LoginRequest;
 import com.fl.authenticationservice.dto.RegisterRequest;
+import com.fl.authenticationservice.jwt.JWTService;
 import com.fl.authenticationservice.service.AuthService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +32,13 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final JWTService jWTService;
 
-    public AuthController(AuthService authService) {
+    private AuthenticationManager authenticationManager;
+
+    public AuthController(AuthService authService, JWTService jWTService) {
         this.authService = authService;
+        this.jWTService = jWTService;
     }
 
     @PostMapping("/register")
@@ -35,4 +47,19 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("token", token));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jWTService.generateToken(authentication);
+
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+    }
 }

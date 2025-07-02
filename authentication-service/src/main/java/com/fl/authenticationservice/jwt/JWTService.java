@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -25,7 +26,7 @@ public class JWTService {
     @Value("${jwt.secret}") //inject value from application properties
     private String  secretKey;
 
-    //Create a JWT token for a given user
+    //Create a JWT token for a given user (Registration)
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role",  user.getRole().toString());
@@ -36,6 +37,17 @@ public class JWTService {
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    //Create a JWT token for a given user (Login)
+    public String generateToken(Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return Jwts.builder()
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
