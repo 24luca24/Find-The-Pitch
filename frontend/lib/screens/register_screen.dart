@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -34,8 +35,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() => isLoading = false);
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Registered successfully!")),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
         // Optionally navigate
       } else {

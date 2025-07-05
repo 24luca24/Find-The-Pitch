@@ -34,11 +34,12 @@ public class AuthController {
     private final AuthService authService;
     private final JWTService jWTService;
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthController(AuthService authService, JWTService jWTService) {
+    public AuthController(AuthService authService, JWTService jWTService, AuthenticationManager authenticationManager) {
         this.authService = authService;
         this.jWTService = jWTService;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/register")

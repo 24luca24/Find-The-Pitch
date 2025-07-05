@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/register_screen.dart';
+import 'package:frontend/screens/welcome_screen.dart';
 
 void main() {
 
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const RegisterScreen(),
+      home: const WelcomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
