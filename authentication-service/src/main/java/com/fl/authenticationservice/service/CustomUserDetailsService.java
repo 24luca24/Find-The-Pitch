@@ -2,6 +2,7 @@ package com.fl.authenticationservice.service;
 
 import com.fl.authenticationservice.entity.User;
 import com.fl.authenticationservice.repository.UserRepository;
+import com.fl.authenticationservice.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,11 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("Loaded user: " + user.getUsername());
         System.out.println("Stored password hash: " + user.getPassword());
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                Collections.emptyList()
-        );
+        return new CustomUserDetails(user);
     }
 
 }

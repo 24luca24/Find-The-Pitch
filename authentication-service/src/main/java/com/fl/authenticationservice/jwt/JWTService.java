@@ -1,6 +1,7 @@
 package com.fl.authenticationservice.jwt;
 
 import com.fl.authenticationservice.entity.User;
+import com.fl.authenticationservice.security.CustomUserDetails;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -43,7 +44,8 @@ public class JWTService {
 
     //Create a JWT token for a given user (Login)
     public String generateToken(Authentication auth) {
-        User user = (User) auth.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        User user = userDetails.getUser();
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date())
