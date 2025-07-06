@@ -1,7 +1,6 @@
-//StatefulWidget -> change because user can type in the fields
 import 'package:flutter/material.dart';
-
-import '../services/auth_service.dart';
+import 'package:frontend/services/auth_service.dart';
+import '../design/registration_design.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -39,7 +38,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           context,
           MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
-        // Optionally navigate
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration failed.")),
@@ -51,46 +49,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Register")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(labelText: "Username"),
-                validator: (value) =>
-                  value!.isEmpty ? "Please enter username" : null,
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-                validator: (value) =>
-                value!.isEmpty ? "Please enter email" : null,
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: "Password"),
-                obscureText: true,
-                validator: (value) =>
-                value!.length < 6 ? "Min 6 characters" : null,
-              ),
-              TextFormField(
-                controller: _cityController,
-                decoration: const InputDecoration(labelText: "City"),
-              ),
-              const SizedBox(height: 20),
-              isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                onPressed: _register,
-                child: const Text("Register"),
-              )
-            ],
-          ),
-        ),
+      body: RegistrationDesign(
+        onLoginPressed: () => Navigator.pop(context),
+        onRegisterPressed: _register,
+        usernameController: _usernameController,
+        emailController: _emailController,
+        passwordController: _passwordController,
+        cityController: _cityController,
+        formKey: _formKey,
+        isLoading: isLoading,
       ),
     );
   }
