@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/design/login_design.dart';
 import '../services/auth_service.dart';
+import 'field_management_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,6 +11,8 @@ class LoginScreen extends StatefulWidget {
 
 }
 class _LoginScreenState extends State<LoginScreen> {
+
+  final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -16,62 +20,38 @@ class _LoginScreenState extends State<LoginScreen> {
   String? error;
 
   void _login() async {
-    setState(() {
-      isLoading = true;
-      error = null;
-    });
+    if (_formKey.currentState!.validate()) {
+      setState(() => isLoading = true);
 
-    final success = await AuthService.login(
-      username: _usernameController.text.trim(),
-      password: _passwordController.text.trim()
-    );
+      bool success = await AuthService.login(
+          username: _usernameController.text,
+          password: _passwordController.text);
 
-    setState(() => isLoading = false);
+      setState(() => isLoading = false);
 
-    if(success) {
-      //Next screen (at the moment show Success)
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
-      );
-    } else {
-        setState(() {
-          error = "Invalid username or password";
-        });
+      if (success) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FieldManagementScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Registration failed.")),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            if(isLoading)
-              const CircularProgressIndicator()
-            else
-              ElevatedButton(
-                onPressed: _login,
-                child: const Text('Login'),
-              ),
-            if(error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text(error!, style: const TextStyle(color: Colors.red)),
-              ),
-          ],
-        )
+      body: LoginDesign(
+          onHomePressed: () => Navigator.pop(context),
+          onLoginPressed: _login,
+          usernameController: _usernameController,
+          passwordController: _passwordController,
+          formKey: _formKey,
+          isLoading: isLoading
       ),
     );
   }
