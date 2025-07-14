@@ -76,7 +76,7 @@ public class Field {
     //Setter and Getter
 
     //ID
-    private void setId(Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public Long getId() {
@@ -84,7 +84,7 @@ public class Field {
     }
 
     //NAME
-    private void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
     public String getName() {
@@ -92,7 +92,7 @@ public class Field {
     }
 
     //DESCRIPTION
-    private void setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
     public String getDescription() {
@@ -100,7 +100,7 @@ public class Field {
     }
 
     //CITY
-    private void setCity(String city) {
+    public void setCity(String city) {
         this.city = city;
     }
     public String getCity() {
@@ -108,7 +108,7 @@ public class Field {
     }
 
     //ADDRESS
-    private void setAddress(String address) {
+    public void setAddress(String address) {
         this.address = address;
     }
     public String getAddress() {
@@ -116,7 +116,7 @@ public class Field {
     }
 
     //PHONE
-    private void setPhone(String phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
     public String getPhone() {
@@ -124,7 +124,7 @@ public class Field {
     }
 
     //EMAIL
-    private void setEmail(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
     public String getEmail() {
@@ -132,7 +132,7 @@ public class Field {
     }
 
     //WEBSITE
-    private void setWebsite(String website) {
+    public void setWebsite(String website) {
         this.website = website;
     }
     public String getWebsite() {
@@ -140,7 +140,7 @@ public class Field {
     }
 
     //CAN SHOWER
-    private void setCanShower(boolean canShower) {
+    public void setCanShower(boolean canShower) {
         this.canShower = canShower;
     }
     public boolean getCanShower() {
@@ -148,7 +148,7 @@ public class Field {
     }
 
     //HAS PARKING
-    private void setHasParking(boolean hasParking) {
+    public void setHasParking(boolean hasParking) {
         this.hasParking = hasParking;
     }
     public boolean getHasParking() {
@@ -156,7 +156,7 @@ public class Field {
     }
 
     //HAS LIGHTING
-    private void setHasLighting(boolean hasLighting) {
+    public void setHasLighting(boolean hasLighting) {
         this.hasLighting = hasLighting;
     }
     public boolean getHasLighting() {
@@ -164,7 +164,7 @@ public class Field {
     }
 
     //IS FREE
-    private void setIsFree(boolean isFree) {
+    public void setIsFree(boolean isFree) {
         this.isFree = isFree;
     }
     public boolean getIsFree() {
@@ -172,7 +172,7 @@ public class Field {
     }
 
     //OPENING TIME
-    private void setOpeningTime(LocalTime openingTime) {
+    public void setOpeningTime(LocalTime openingTime) {
         this.openingTime = openingTime;
     }
     public LocalTime getOpeningTime() {
@@ -180,7 +180,7 @@ public class Field {
     }
 
     //LUNCH BRAKE START
-    private void setLunchBrakeStart(LocalTime lunchBrakeStart) {
+    public void setLunchBrakeStart(LocalTime lunchBrakeStart) {
         this.lunchBrakeStart = lunchBrakeStart;
     }
     public LocalTime getLunchBrakeStart() {
@@ -188,7 +188,7 @@ public class Field {
     }
 
     //LUNCH BRAKE END
-    private void setLunchBrakeEnd(LocalTime lunchBrakeEnd) {
+    public void setLunchBrakeEnd(LocalTime lunchBrakeEnd) {
         this.lunchBrakeEnd = lunchBrakeEnd;
     }
     public LocalTime getLunchBrakeEnd() {
@@ -196,7 +196,7 @@ public class Field {
     }
 
     //CLOSING TIME
-    private void setClosingTime(LocalTime closingTime) {
+    public void setClosingTime(LocalTime closingTime) {
         this.closingTime = closingTime;
     }
     public LocalTime getClosingTime() {
@@ -204,7 +204,7 @@ public class Field {
     }
 
     //PRICE
-    private void setPrice(float price) {
+    public void setPrice(float price) {
         this.price = price;
     }
     public float getPrice() {
@@ -212,7 +212,7 @@ public class Field {
     }
 
     //SURFACETYPE
-    private void setSurfaceType(SurfaceType surfaceType) {
+    public void setSurfaceType(SurfaceType surfaceType) {
         this.surfaceType = surfaceType;
     }
     public SurfaceType getSurfaceType() {
@@ -220,7 +220,7 @@ public class Field {
     }
 
     //PITCHTYPE
-    private void setPitchType(PitchType pitchType) {
+    public void setPitchType(PitchType pitchType) {
         this.pitchType = pitchType;
     }
     public PitchType getPitchType() {
@@ -228,7 +228,7 @@ public class Field {
     }
 
     //AREATYPE
-    private void setAreaType(AreaType areaType) {
+    public void setAreaType(AreaType areaType) {
         this.areaType = areaType;
     }
     public AreaType getAreaType() {
@@ -236,7 +236,7 @@ public class Field {
     }
 
     //IMAGES
-    private void setImages(List<Image> images) {
+    public void setImages(List<Image> images) {
         this.images = images;
     }
     public List<Image> getImages() {

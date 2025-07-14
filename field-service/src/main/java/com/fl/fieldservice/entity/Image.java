@@ -27,7 +27,7 @@ public class Image {
     //Getter and Setter
 
     //ID
-    private void setId(Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public Long getId() {
@@ -35,7 +35,7 @@ public class Image {
     }
 
     //DATA
-    private void setData(byte[] data) {
+    public void setData(byte[] data) {
         this.data = data;
     }
     public byte[] getData() {
@@ -43,7 +43,7 @@ public class Image {
     }
 
     //FIELD
-    private void setField(Field field) {
+    public void setField(Field field) {
         this.field = field;
     }
     public Field getField() {

@@ -1,9 +1,18 @@
 package com.fl.fieldservice.controller;
 
+import com.fl.fieldservice.dto.FieldRequestDto;
+import com.fl.fieldservice.entity.Field;
 import com.fl.fieldservice.repository.FieldRepository;
+import com.fl.fieldservice.service.FieldService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 //What your mobile app or frontend talks to via HTTP
 //Uses the Service layer to return data
@@ -13,6 +22,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/fields")
 public class FieldController {
 
-    @Autowired
-    private FieldRepository fieldRepository;
+    private FieldService fieldService;
+
+    public FieldController(FieldService fieldService) {
+        this.fieldService = fieldService;
+    }
+
+    @PostMapping(value = "/addField", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Field> addField(
+            @RequestPart("field") @Valid FieldRequestDto request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+        Field saved = fieldService.addField(request, images);
+        return ResponseEntity.ok(saved);
+    }
 }
