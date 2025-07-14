@@ -73,4 +73,36 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
   }
+
+  //To retrieve city for autocompletion
+  static Future<List<String>> fetchCitySuggestions(String query) async {
+    final url = Uri.parse('$baseURL/api/cities/autocomplete?prefix=$query');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> cities = jsonDecode(response.body);
+        return cities.map<String>((city) => city.toString()).toList();
+      } else {
+        logger.e('Failed to fetch cities: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      logger.e('Error fetching city suggestions: $e');
+      return [];
+    }
+  }
+
+  // Check availability of username
+  static Future<bool> checkUsernameAvailable(String username) async {
+    final response = await http.get(
+        Uri.parse('$baseURL/users/check-username?name=$username'));
+    if (response.statusCode == 200) {
+      return response.body == 'true';
+    } else {
+      final errorMsg = jsonDecode(response.body)['message'] ?? 'Registration failed';
+      logger.e('Registration failed: $errorMsg');
+      throw Exception('Failed to check username');
+    }
+  }
+
 }

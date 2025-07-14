@@ -14,10 +14,10 @@ public class SecurityConfigNet {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable) // 👈 CSRF disabled safely
+                .csrf(AbstractHttpConfigurer::disable) //CSRF disabled safely
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // 👈 Public access to your registration endpoint
-                        .anyRequest().authenticated()               // 👈 Other routes still require auth (if any)
+                        .requestMatchers("/**").permitAll() //Public access to your registration endpoint
+                        .anyRequest().authenticated()               //Other routes still require auth (if any)
                 )
                 .build();
     }

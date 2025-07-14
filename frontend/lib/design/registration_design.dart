@@ -9,8 +9,14 @@ class RegistrationDesign extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final TextEditingController cityController;
-  final GlobalKey<FormState> formKey;
   final bool isLoading;
+
+  final String? Function(String?) usernameValidator;
+  final String? Function(String?) emailValidator;
+  final String? Function(String?) passwordValidator;
+  final String? Function(String?) cityValidator;
+
+  final Widget? customCityField;
 
   const RegistrationDesign({
     super.key,
@@ -20,8 +26,12 @@ class RegistrationDesign extends StatelessWidget {
     required this.emailController,
     required this.passwordController,
     required this.cityController,
-    required this.formKey,
     required this.isLoading,
+    required this.usernameValidator,
+    required this.passwordValidator,
+    required this.cityValidator,
+    required this.emailValidator,
+    required this.customCityField,
   });
 
   @override
@@ -49,44 +59,30 @@ class RegistrationDesign extends StatelessWidget {
           ),
         ),
 
-        // Form content
+        // Form content (no longer wraps Form here)
         Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Form(
-              key: formKey,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildLabeledField("Username", usernameController, validator: (val) {
-                      if (val == null || val.isEmpty) return "Please enter username";
-                      return null;
-                    }),
-                    _buildLabeledField("Email", emailController, validator: (val) {
-                      if (val == null || val.isEmpty) return "Please enter email";
-                      return null;
-                    }),
-                    _buildLabeledField("Password", passwordController,
-                        obscure: true,
-                        validator: (val) {
-                          if (val == null || val.length < 6) return "Min 6 characters";
-                          return null;
-                        }),
-                    _buildLabeledField("City", cityController),
-                    const SizedBox(height: 24),
-                    isLoading
-                        ? const CircularProgressIndicator()
-                        : SizedBox(
-                      width: 200, // Narrower button
-                      child: PrimaryButton(
-                        text: "Register",
-                        onPressed: onRegisterPressed,
-                      ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildLabeledField("Username", usernameController, validator: usernameValidator),
+                  _buildLabeledField("Email", emailController, validator: emailValidator),
+                  _buildLabeledField("Password", passwordController, obscure: true, validator: passwordValidator),
+                  customCityField ?? _buildLabeledField("City", cityController, validator: cityValidator),
+                  const SizedBox(height: 24),
+                  isLoading
+                      ? const CircularProgressIndicator()
+                      : SizedBox(
+                    width: 200,
+                    child: PrimaryButton(
+                      text: "Register",
+                      onPressed: onRegisterPressed,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -118,6 +114,7 @@ class RegistrationDesign extends StatelessWidget {
               controller: controller,
               obscureText: obscure,
               validator: validator,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 filled: true,

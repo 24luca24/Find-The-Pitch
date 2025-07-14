@@ -64,7 +64,7 @@ class LoginDesign extends StatelessWidget {
                         "Password", passwordController,
                         obscure: true,
                         validator: (val) {
-                          if (val == null || val.length < 6) return "Min 6 characters";
+                          if (val == null || val.length < 8) return "Min 8 characters";
                           return null;
                         }),
                     const SizedBox(height: 24),

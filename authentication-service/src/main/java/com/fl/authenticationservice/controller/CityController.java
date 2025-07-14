@@ -3,11 +3,7 @@ package com.fl.authenticationservice.controller;
 import com.fl.authenticationservice.entity.City;
 import com.fl.authenticationservice.repository.CityRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +20,15 @@ public class CityController {
 
     @GetMapping("/autocomplete")
     public ResponseEntity<List<String>> autocomplete(@RequestParam String prefix) {
+        if(prefix == null || prefix.isBlank()) {
+            return ResponseEntity.badRequest().body(List.of());
+        }
         List<City> results = cityRepository.findByNameStartingWithIgnoreCase(prefix);
         List<String> resultsCityName = new ArrayList<>();
         for (City city : results) {
-            resultsCityName.add(city.getName());
+            if(city.getName() != null) {
+                resultsCityName.add(city.getName());
+            }
         }
         return ResponseEntity.ok(resultsCityName);
     }
