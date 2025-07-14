@@ -5,11 +5,13 @@ import '../widgets/primary_button.dart';
 class WelcomeDesign extends StatelessWidget {
   final VoidCallback onLoginPressed;
   final VoidCallback onRegisterPressed;
+  final VoidCallback onGuestPressed;
 
   const WelcomeDesign({
     super.key,
     required this.onLoginPressed,
     required this.onRegisterPressed,
+    required this.onGuestPressed,
   });
 
   @override
@@ -59,6 +61,11 @@ class WelcomeDesign extends StatelessWidget {
                 PrimaryButton(
                   text: "Register",
                   onPressed: onRegisterPressed,
+                ),
+                const SizedBox(height: 16),
+                PrimaryButton(
+                    text: "Guest Access",
+                    onPressed: onGuestPressed
                 ),
               ],
             ),

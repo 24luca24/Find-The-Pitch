@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/map_screen.dart';
 import '../design/welcome_design.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
@@ -22,6 +23,12 @@ class WelcomeScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const RegisterScreen()),
           );
         },
+        onGuestPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MapScreen()),
+          );
+        }
       ),
     );
   }
