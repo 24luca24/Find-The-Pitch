@@ -2,9 +2,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 class AuthService {
-  static const String baseURL = 'http://127.0.0.1:8080';
+  static final String baseURL = Platform.isIOS
+      ? 'http://host.docker.internal:8080'
+      : 'http://127.0.0.1:8080';
 
   // Create a logger instance
   static final Logger logger = Logger();

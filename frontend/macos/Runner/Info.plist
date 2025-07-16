@@ -28,5 +28,15 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs access to your location to show your position on the map.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>This app needs access to your location even when the app is in the background.</string>
+    <!-- Allow HTTP connections (for dev backend) -->
+    	<key>NSAppTransportSecurity</key>
+    	<dict>
+    		<key>NSAllowsArbitraryLoads</key>
+    		<true/>
+    	</dict>
 </dict>
 </plist>
