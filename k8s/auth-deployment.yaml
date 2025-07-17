@@ -1,0 +1,21 @@
+#define how many replicas of a service to run
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication-service
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - name: auth
+          image: authentication-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080

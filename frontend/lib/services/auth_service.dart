@@ -5,9 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class AuthService {
-  static final String baseURL = Platform.isIOS
-      ? 'http://host.docker.internal:8080'
-      : 'http://127.0.0.1:8080';
+
+  static final String authURL = Platform.isIOS
+      ? 'http://localhost:8080'
+      : 'http://192.168.1.19:30081';
+
+  static final String fieldURL = Platform.isIOS
+      ? 'http://localhost:8081'
+      : 'http://192.168.49.2:30082';
 
   // Create a logger instance
   static final Logger logger = Logger();
@@ -18,7 +23,7 @@ class AuthService {
     required String password,
     required String city,
   }) async {
-    final url = Uri.parse("$baseURL/api/auth/register");
+    final url = Uri.parse("$authURL/api/auth/register");
     try {
       final response = await http.post(
         url,
@@ -44,7 +49,7 @@ class AuthService {
     required String username,
     required String password,
   }) async {
-    final url = Uri.parse("$baseURL/api/auth/login");
+    final url = Uri.parse("$authURL/api/auth/login");
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -79,7 +84,7 @@ class AuthService {
 
   //To retrieve city for autocompletion
   static Future<List<String>> fetchCitySuggestions(String query) async {
-    final url = Uri.parse('$baseURL/api/cities/autocomplete?prefix=$query');
+    final url = Uri.parse('$authURL/api/cities/autocomplete?prefix=$query');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -98,7 +103,7 @@ class AuthService {
   // Check availability of username
   static Future<bool> checkUsernameAvailable(String username) async {
     final response = await http.get(
-        Uri.parse('$baseURL/users/check-username?name=$username'));
+        Uri.parse('$authURL/users/check-username?name=$username'));
     if (response.statusCode == 200) {
       return response.body == 'true';
     } else {

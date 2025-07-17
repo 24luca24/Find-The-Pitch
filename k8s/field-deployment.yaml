@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: field-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: field-service
+  template:
+    metadata:
+      labels:
+        app: field-service
+    spec:
+      containers:
+        - name: field
+          image: field-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
