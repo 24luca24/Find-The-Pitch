@@ -3,15 +3,16 @@ import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthService {
 
-  static final String authURL = Platform.isIOS
-      ? 'http://localhost:8080'
+  static final String? authURL = Platform.isIOS
+      ? dotenv.env['AUTH_URL']
       : 'http://192.168.1.19:30081';
 
-  static final String fieldURL = Platform.isIOS
-      ? 'http://localhost:8081'
+  static final String? fieldURL = Platform.isIOS
+      ? dotenv.env['FIELD_URL']
       : 'http://192.168.49.2:30082';
 
   // Create a logger instance
