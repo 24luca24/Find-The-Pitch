@@ -9,98 +9,92 @@ class MapDesign extends StatelessWidget {
   final LatLng currentLocation;
 
   const MapDesign({
-    Key? key,
+    super.key,
     required this.center,
     required this.zoom,
     required this.mapController,
     required this.currentLocation,
-  }): super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        FlutterMap(
-          mapController: mapController,
-          options: MapOptions(
-            initialCenter: center,
-            initialZoom: 13.0,
-            minZoom: 3.0,
-            maxZoom: 18.0,
-            interactionOptions: const InteractionOptions(
-              flags: InteractiveFlag.all,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        children: [
+          FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              initialCenter: center,
+              initialZoom: zoom,
+              minZoom: 3.0,
+              maxZoom: 18.0,
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.all,
+              ),
             ),
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-              userAgentPackageName: 'com.example.frontend',
-            ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  point: center,
-                  width: 60,
-                  height: 60,
-                  child: const Icon(
-                    Icons.my_location,
-                    color: Colors.red,
-                    size: 40,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-
-        // Floating buttons for Zoom and Go Home
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: Column(
             children: [
-              FloatingActionButton(
-                heroTag: 'zoomIn',
-                mini: true,
-                tooltip: 'Zoom In',
-                onPressed: () {
+              TileLayer(
+                urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                userAgentPackageName: 'com.example.frontend',
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: center,
+                    width: 60,
+                    height: 60,
+                    child: const Icon(
+                      Icons.my_location,
+                      color: Colors.red,
+                      size: 40,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Zoom and Location Controls
+          Positioned(
+            bottom: 20,
+            right: 12,
+            child: Column(
+              children: [
+                _buildMapButton(Icons.add, 'zoomIn', () {
                   mapController.move(
                     mapController.camera.center,
                     mapController.camera.zoom + 1,
                   );
-                },
-                child: const Icon(Icons.add),
-              ),
-              const SizedBox(height: 8),
-              FloatingActionButton(
-                heroTag: 'zoomOut',
-                mini: true,
-                tooltip: 'Zoom Out',
-                onPressed: () {
+                }),
+                const SizedBox(height: 10),
+                _buildMapButton(Icons.remove, 'zoomOut', () {
                   mapController.move(
                     mapController.camera.center,
                     mapController.camera.zoom - 1,
                   );
-                },
-                child: const Icon(Icons.remove),
-              ),
-              const SizedBox(height: 8),
-              FloatingActionButton(
-                heroTag: 'goHome',
-                mini: true,
-                tooltip: 'Recenter to My Location',
-                onPressed: () {
-                  mapController.move(
-                    currentLocation, // Ensure this is your latest location
-                    13.0,
-                  );
-                },
-                child: const Icon(Icons.home),
-              ),
-            ],
+                }),
+                const SizedBox(height: 10),
+                _buildMapButton(Icons.home, 'goHome', () {
+                  mapController.move(currentLocation, 13.0);
+                }),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMapButton(IconData icon, String heroTag,
+      VoidCallback onPressed) {
+    return FloatingActionButton(
+      heroTag: heroTag,
+      mini: true,
+      backgroundColor: Colors.green.shade100,
+      foregroundColor: Colors.black,
+      onPressed: onPressed,
+      child: Icon(icon),
     );
   }
 }

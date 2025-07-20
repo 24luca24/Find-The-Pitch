@@ -20,7 +20,7 @@ class _MapScreenState extends State<MapScreen> {
 
   //Default Milan
   LatLng _currentLocation = LatLng(45.4642, 9.19);
-  double _zoom = 13.0;
+  final double _zoom = 13.0;
 
   @override
   void initState() {
@@ -40,16 +40,16 @@ class _MapScreenState extends State<MapScreen> {
         return;
       }
 
-    Position position = await Geolocator.getCurrentPosition();
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setDouble('latitude', position.latitude);
-    await preferences.setDouble('longitude', position.longitude);
-    setState(() {
-      _currentLocation = LatLng(position.latitude, position.longitude);
-    });
+      Position position = await Geolocator.getCurrentPosition();
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      await preferences.setDouble('latitude', position.latitude);
+      await preferences.setDouble('longitude', position.longitude);
+      setState(() {
+        _currentLocation = LatLng(position.latitude, position.longitude);
+      });
 
-    //Move the map to the new location
-    _mapController.move(_currentLocation, _zoom);
+      //Move the map to the new location
+      _mapController.move(_currentLocation, _zoom);
     }
   }
 
@@ -80,17 +80,41 @@ class _MapScreenState extends State<MapScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                ElevatedButton(onPressed: () {}, child: const Text('Filter')),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[50],
+                    foregroundColor: Colors.green[900],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text('Filter'),
+                ),
                 const SizedBox(width: 8),
-                ElevatedButton(onPressed: () {}, child: const Text('Add Field')),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[50],
+                    foregroundColor: Colors.green[900],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text('Add Field'),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Search by name or city',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       isDense: true,
-                      contentPadding: EdgeInsets.all(8),
+                      contentPadding: const EdgeInsets.all(10),
                     ),
                   ),
                 ),
@@ -98,15 +122,31 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ),
 
-          // Map view (from map_design.dart)
+          // Full height map minus top controls and bottom nav
           Expanded(
-              child: MapDesign(
-                center: _currentLocation,
-                zoom: _zoom,
-                mapController: _mapController,
-                currentLocation: _currentLocation,
-              )),
+            child: MapDesign(
+              center: _currentLocation,
+              zoom: _zoom,
+              mapController: _mapController,
+              currentLocation: _currentLocation,
+            ),
+          ),
         ],
+      ),
+
+      // Bottom navigation bar
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.leaderboard), label: 'Rank'),
+          BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Add'),
+          BottomNavigationBarItem(icon: Icon(Icons.book_online), label: 'Book'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+        ],
+        onTap: (index) {
+          // TODO: Handle tab change
+        },
       ),
     );
   }
