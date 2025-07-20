@@ -15,7 +15,9 @@ class MandatoryFieldsForm extends StatelessWidget {
   final TextEditingController phoneController;
   final TextEditingController mailController;
   final bool isFree;
+  final ValueChanged<bool?> onIsFreeChanged;
   final PitchType? pitchType;
+  final ValueChanged<PitchType?> onPitchTypeChanged;
 
   const MandatoryFieldsForm({
     super.key,
@@ -27,6 +29,8 @@ class MandatoryFieldsForm extends StatelessWidget {
     required this.mailController,
     required this.isFree,
     required this.pitchType,
+    required this.onIsFreeChanged,
+    required this.onPitchTypeChanged,
   });
 
   @override
@@ -132,7 +136,6 @@ class MandatoryFieldsForm extends StatelessWidget {
     if (name == null || name.trim().isEmpty) {
       return 'Name is required';
     }
-    //function to check if a field name already exists
     return null;
   }
 
@@ -147,25 +150,36 @@ class MandatoryFieldsForm extends StatelessWidget {
     if (address == null || address.trim().isEmpty) {
       return 'Address is required';
     }
-
-    //TODO: check whether has a number in the string
+    final hasNumber = RegExp(r'\d').hasMatch(address);
+    if (!hasNumber) {
+      return 'Address must contain a number (street number)';
+    }
     return null;
   }
 
-  String? validatorPhone(String? phone){
+  String? validatorPhone(String? phone) {
     if (phone == null || phone.trim().isEmpty) {
       return 'Phone is required';
     }
-    //TODO: check if contains a prefix or if its are only number no string
+
+    //Check that it contains only digits (optional + at start)
+    final isValid = RegExp(r'^\+?[0-9]{7,15}$').hasMatch(phone);
+    if (!isValid) {
+      return 'Phone must contain only numbers and an optional +';
+    }
     return null;
   }
 
-  String? validatorMail(String? mail){
+
+  String? validatorMail(String? mail) {
     if (mail == null || mail.trim().isEmpty) {
-      return 'Mail is required';
+      return 'Email is required';
     }
 
-    //TODO: check mail is correct
+    final isValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(mail);
+    if (!isValid) {
+      return 'Enter a valid email address';
+    }
     return null;
   }
 

@@ -60,6 +60,20 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
     }
   }
 
+  void _handlePitchTypeChanged(PitchType? newValue) {
+    setState(() {
+      _pitchType = newValue;
+    });
+  }
+
+  void _handleIsFreeChanged(bool? value) {
+    if (value != null) {
+      setState(() {
+        _isFree = value;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -85,6 +99,8 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
           mailController: _mailController,
           isFree: _isFree,
           pitchType: _pitchType,
+          onIsFreeChanged: _handleIsFreeChanged,
+          onPitchTypeChanged: _handlePitchTypeChanged,
         )
         : OptionalFieldsForm(
           formKey: _formKeyOptional,
@@ -112,6 +128,5 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
       ),
     );
   }
-
 }
 
