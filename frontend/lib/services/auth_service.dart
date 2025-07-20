@@ -11,10 +11,6 @@ class AuthService {
       ? dotenv.env['AUTH_URL']
       : 'http://192.168.1.19:30081';
 
-  static final String? fieldURL = Platform.isIOS
-      ? dotenv.env['FIELD_URL']
-      : 'http://192.168.49.2:30082';
-
   // Create a logger instance
   static final Logger logger = Logger();
 
@@ -101,7 +97,7 @@ class AuthService {
     }
   }
 
-  // Check availability of username
+  //Check availability of username
   static Future<bool> checkUsernameAvailable(String username) async {
     final response = await http.get(
         Uri.parse('$authURL/users/check-username?name=$username'));
@@ -113,5 +109,4 @@ class AuthService {
       throw Exception('Failed to check username');
     }
   }
-
 }

@@ -4,12 +4,14 @@ import com.fl.fieldservice.dto.FieldRequestDto;
 import com.fl.fieldservice.entity.Field;
 import com.fl.fieldservice.entity.Image;
 import com.fl.fieldservice.repository.FieldRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 //Handle logic, like verifying if a field is already saved when trying to save it
 
@@ -56,5 +58,13 @@ public class FieldService {
         field.setImages(fieldRequestDto.getImageList());
 
         return fieldRepository.save(field);
+    }
+
+    public Optional<Field> findById(Long fieldId) {
+        return fieldRepository.findById(fieldId);
+    }
+
+    public Optional<Field> findByNameCityAddress(String fieldName, String city, String address) {
+        return fieldRepository.findByNameCityAddress(fieldName, city, address);
     }
 }
