@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/services/auth_service.dart';
-import 'package:http/http.dart' as http;
 import '../design/registration_design.dart';
 import 'login_screen.dart';
 import 'dart:async';
@@ -19,6 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _cityController = TextEditingController();
+  //late means: I promise this variable will be initialized before I use it.
   late final TextEditingController _autocompleteCityController;
 
 

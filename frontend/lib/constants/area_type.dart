@@ -1,0 +1,4 @@
+enum AreaType {
+  indoor,
+  outdoor,
+}
