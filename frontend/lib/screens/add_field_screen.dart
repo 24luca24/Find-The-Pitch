@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/services/field_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../constants/area_type.dart';
 import '../constants/pitch_type.dart';
@@ -152,10 +153,12 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
     }
   }
 
-  void _handleAddImage(File? image) {
-    if(image != null) {
+  void _handleAddImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if(pickedFile != null) {
       setState(() {
-        _images.add(image);
+        _images.add(File(pickedFile.path));
       });
     }
   }
@@ -170,8 +173,8 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
           address: _addressController.text.trim(),
           phone: _phoneController.text.trim(),
           mail: _mailController.text.trim(),
-          _isFree: _isFree,
-          _pitchType: _pitchType,
+          isFree: _isFree,
+          pitchType: _pitchType,
         );
 
         setState(() {

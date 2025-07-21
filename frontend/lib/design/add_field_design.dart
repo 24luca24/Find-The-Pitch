@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/area_type.dart';
 import 'package:frontend/constants/pitch_type.dart';
 import 'package:frontend/constants/surface_type.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MandatoryFieldsForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -364,7 +365,7 @@ class OptionalFieldsForm extends StatelessWidget {
 
             const SizedBox(height: 16),
             Text('Images'),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
@@ -372,7 +373,7 @@ class OptionalFieldsForm extends StatelessWidget {
                   alignment: Alignment.topRight,
                   children: [
                     Image.file(file, width: 100, height: 100, fit: BoxFit.cover),
-                    // You might want a delete button here if needed
+                    // Optional: add a delete button
                   ],
                 )),
                 GestureDetector(
