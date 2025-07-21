@@ -201,6 +201,18 @@ class OptionalFieldsForm extends StatelessWidget {
   final AreaType? areaType;
   final List<File> images;
 
+  //Callbacks for time pickers and toggles (to update parent state)
+  final ValueChanged<bool> onCanShowerChanged;
+  final ValueChanged<bool> onHasParkingChanged;
+  final ValueChanged<bool> onHasLightingChanged;
+  final ValueChanged<TimeOfDay?> onOpeningTimeChanged;
+  final ValueChanged<TimeOfDay?> onLunchBrakeStartChanged;
+  final ValueChanged<TimeOfDay?> onLunchBrakeEndChanged;
+  final ValueChanged<TimeOfDay?> onClosingTimeChanged;
+  final ValueChanged<SurfaceType?> onSurfaceTypeChanged;
+  final ValueChanged<AreaType?> onAreaTypeChanged;
+  final VoidCallback onAddImage; //for image picker button
+
   const OptionalFieldsForm({
     super.key,
     required this.formKey,
@@ -217,16 +229,166 @@ class OptionalFieldsForm extends StatelessWidget {
     required this.surfaceType,
     required this.areaType,
     required this.images,
+    required this.onCanShowerChanged,
+    required this.onHasParkingChanged,
+    required this.onHasLightingChanged,
+    required this.onOpeningTimeChanged,
+    required this.onLunchBrakeStartChanged,
+    required this.onLunchBrakeEndChanged,
+    required this.onClosingTimeChanged,
+    required this.onSurfaceTypeChanged,
+    required this.onAreaTypeChanged,
+    required this.onAddImage,
   });
+
+  Future<void> _pickTime(BuildContext context, TimeOfDay? initialTime, ValueChanged<TimeOfDay?> onTimeChanged) async {
+    final picked = await showTimePicker(context: context, initialTime: initialTime ?? TimeOfDay.now());
+    if (picked != null) {
+      onTimeChanged(picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
       child: Form(
         key: formKey,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Optional fields go here, e.g. description, website, switches, time pickers, etc.
+            TextFormField(
+              controller: descriptionController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Description',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            TextFormField(
+              controller: websiteController,
+              decoration: InputDecoration(
+                labelText: 'Website',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.url,
+            ),
+            const SizedBox(height: 16),
+
+            SwitchListTile(
+              title: Text('Can Shower'),
+              value: canShower,
+              onChanged: onCanShowerChanged,
+            ),
+
+            SwitchListTile(
+              title: Text('Has Parking'),
+              value: hasParking,
+              onChanged: onHasParkingChanged,
+            ),
+
+            SwitchListTile(
+              title: Text('Has Lighting'),
+              value: hasLighting,
+              onChanged: onHasLightingChanged,
+            ),
+
+            const SizedBox(height: 16),
+            Text('Opening Time'),
+            ListTile(
+              title: Text(openingTime?.format(context) ?? 'Select Opening Time'),
+              trailing: Icon(Icons.access_time),
+              onTap: () => _pickTime(context, openingTime, onOpeningTimeChanged),
+            ),
+
+            Text('Lunch Break Start'),
+            ListTile(
+              title: Text(lunchBrakeStart?.format(context) ?? 'Select Lunch Break Start'),
+              trailing: Icon(Icons.access_time),
+              onTap: () => _pickTime(context, lunchBrakeStart, onLunchBrakeStartChanged),
+            ),
+
+            Text('Lunch Break End'),
+            ListTile(
+              title: Text(lunchBrakeEnd?.format(context)?? 'Select Lunch Break End'),
+              trailing: Icon(Icons.access_time),
+              onTap: () => _pickTime(context, lunchBrakeEnd, onLunchBrakeEndChanged),
+            ),
+
+            Text('Closing Time'),
+            ListTile(
+              title: Text(closingTime?.format(context) ?? 'Select Closing Time'),
+              trailing: Icon(Icons.access_time),
+              onTap: () => _pickTime(context, closingTime, onClosingTimeChanged),
+            ),
+
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: priceController,
+              decoration: InputDecoration(
+                labelText: 'Price',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+
+            const SizedBox(height: 16),
+            DropdownButtonFormField<SurfaceType>(
+              value: surfaceType,
+              decoration: InputDecoration(labelText: 'Surface Type'),
+              items: SurfaceType.values.map((surface) {
+                return DropdownMenuItem(
+                  value: surface,
+                  child: Text(surface.name),
+                );
+              }).toList(),
+              onChanged: onSurfaceTypeChanged,
+              validator: (value) => value == null ? 'Select surface type' : null,
+            ),
+
+            const SizedBox(height: 16),
+            DropdownButtonFormField<AreaType>(
+              value: areaType,
+              decoration: InputDecoration(labelText: 'Area Type'),
+              items: AreaType.values.map((area) {
+                return DropdownMenuItem(
+                  value: area,
+                  child: Text(area.name),
+                );
+              }).toList(),
+              onChanged: onAreaTypeChanged,
+              validator: (value) => value == null ? 'Select area type' : null,
+            ),
+
+            const SizedBox(height: 16),
+            Text('Images'),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ...images.map((file) => Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Image.file(file, width: 100, height: 100, fit: BoxFit.cover),
+                    // You might want a delete button here if needed
+                  ],
+                )),
+                GestureDetector(
+                  onTap: onAddImage,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey[300],
+                    child: Icon(Icons.add_a_photo, size: 40, color: Colors.grey[700]),
+                  ),
+                )
+              ],
+            ),
+
+            const SizedBox(height: 24),
+            // The submit button should be in your screen widget for better control
           ],
         ),
       ),

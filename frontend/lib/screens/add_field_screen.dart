@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/services/field_service.dart';
 
 import '../constants/area_type.dart';
 import '../constants/pitch_type.dart';
@@ -17,6 +18,9 @@ class AddFieldScreen extends StatefulWidget {
 class _AddFieldScreenState extends State<AddFieldScreen> {
 
   final _formKey = GlobalKey<FormState>();
+
+  //Holds ID of created field from backend. Useful to store than images because they need a field reference
+  String? _createdFieldId;
 
   //Mandatory Fields (_ means private)
   final _nameController = TextEditingController();
@@ -49,9 +53,11 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
 
   //Method to change page
   void _nextPage() {
-    if(_currentPage < 1) {
-      _pageController.animateToPage(_currentPage + 1, duration: Duration(milliseconds: 300), curve: Curves.ease);
-    }
+   if(_currentPage == 0) {
+     _continueFromMandatoryFields();
+   } else if (_currentPage == 1) {
+     _submitOptional();
+   }
   }
 
   void _previousPage() {
@@ -74,6 +80,143 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
     }
   }
 
+  void _handleCanShowerChanged(bool? value) {
+    if(value != null) {
+      setState(() {
+        _canShower = value;
+      });
+    }
+  }
+
+  void _handleHasParkingChanged(bool? value) {
+    if (value != null) {
+      setState(() {
+        _hasParking = value;
+      });
+    }
+  }
+
+  void _handleHasLightiningChanged(bool? value) {
+    if (value != null) {
+      setState(() {
+        _hasLighting = value;
+      });
+    }
+  }
+
+  void _handleOpeningTimeChanged(TimeOfDay? newTime) {
+    if (newTime != null) {
+      setState(() {
+        _openingTime = newTime;
+      });
+    }
+  }
+
+  void _handleLunchBrakeStartChanged(TimeOfDay? newTime) {
+    if (newTime != null) {
+      setState(() {
+        _lunchBrakeStart = newTime;
+      });
+    }
+  }
+
+  void _handleLunchBrakeEndChanged(TimeOfDay? newTime) {
+    if (newTime != null) {
+      setState(() {
+        _lunchBrakeEnd = newTime;
+      });
+    }
+  }
+
+  void _handleClosingTimeChanged(TimeOfDay? newTime) {
+    if (newTime != null) {
+      setState(() {
+        _closingTime = newTime;
+      });
+    }
+  }
+
+  void _handleSurfaceTypeChanged(SurfaceType? value) {
+    if(value != null) {
+      setState(() {
+        _surfaceType = value;
+      });
+    }
+  }
+
+  void _handleAreaChanged(AreaType? value) {
+    if(value != null) {
+      setState(() {
+        _areaType = value;
+      });
+    }
+  }
+
+  void _handleAddImage(File? image) {
+    if(image != null) {
+      setState(() {
+        _images.add(image);
+      });
+    }
+  }
+
+  //Function to validate the first part of the form and create a field
+  Future<void> _continueFromMandatoryFields() async {
+    if (_formKeyMandatory.currentState?.validate() ?? false) {
+      try {
+        final createdField = await FieldService.createField(
+          name: _nameController.text.trim(),
+          city: _autocompleteCityController.text.trim(),
+          address: _addressController.text.trim(),
+          phone: _phoneController.text.trim(),
+          mail: _mailController.text.trim(),
+          _isFree: _isFree,
+          _pitchType: _pitchType,
+        );
+
+        setState(() {
+          _createdFieldId = createdField.id;
+          _currentPage = 1;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating field: $e')));
+      }
+    }
+  }
+
+  //Function to update the instance field created (adding optional fields)
+  Future<void> _submitOptional() async {
+    if (_formKeyOptional.currentState?.validate() ?? false) {
+      if (_createdFieldId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No field ID available')));
+        return;
+      }
+
+      try {
+        await FieldService.updateField(
+          id: _createdFieldId!,
+          description: _descriptionController.text.trim(),
+          website: _websiteController.text.trim(),
+          canShower: _canShower,
+          hasParking: _hasParking,
+          hasLighting: _hasLighting,
+          openingTime: _openingTime,
+          lunchBrakeStart: _lunchBrakeStart,
+          lunchBrakeEnd: _lunchBrakeEnd,
+          closingTime: _closingTime,
+          price: _priceController.text.trim(),
+          surfaceType: _surfaceType,
+          areaType: _areaType,
+          images: _images,
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Field updated successfully!')));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating field: $e')));
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -83,7 +226,15 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
   @override
   void dispose() {
     super.dispose();
+    _nameController.dispose();
     _autocompleteCityController.dispose();
+    _addressController.dispose();
+    _phoneController.dispose();
+    _mailController.dispose();
+    _descriptionController.dispose();
+    _websiteController.dispose();
+    _priceController.dispose();
+    _pageController.dispose();
   }
 
   @override
@@ -117,6 +268,16 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
           surfaceType: _surfaceType,
           areaType: _areaType,
           images: _images,
+          onCanShowerChanged: _handleCanShowerChanged,
+          onHasParkingChanged: _handleHasParkingChanged,
+          onHasLightingChanged: _handleHasLightiningChanged,
+          onOpeningTimeChanged:_handleOpeningTimeChanged,
+          onLunchBrakeStartChanged: _handleLunchBrakeStartChanged,
+          onLunchBrakeEndChanged: _handleLunchBrakeEndChanged,
+          onClosingTimeChanged: _handleClosingTimeChanged,
+          onSurfaceTypeChanged: _handleSurfaceTypeChanged,
+          onAreaTypeChanged: _handleAreaChanged,
+          onAddImage: _handleAddImage,
       ),
       bottomNavigationBar: Row(
         children: [
