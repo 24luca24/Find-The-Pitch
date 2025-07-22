@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface FieldRepository extends JpaRepository<Field, Long> {
 
     Optional<Field> findByNameCityAddress(String fieldName, String city, String address);
+
+    Optional<Object> createField(String name, String city, String address, String phone, String mail, boolean isFree, String pitchType);
 }

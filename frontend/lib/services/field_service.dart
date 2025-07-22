@@ -132,7 +132,7 @@ class FieldService {
     };
 
     final response = await http.put(
-      Uri.parse('$fieldURL/api/fields/$id/update'),
+      Uri.parse('$fieldURL/api/fields/$id/updateField'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(body),
     );

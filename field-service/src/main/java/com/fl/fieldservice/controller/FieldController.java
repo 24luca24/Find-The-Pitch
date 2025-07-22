@@ -3,6 +3,8 @@ package com.fl.fieldservice.controller;
 import com.fl.fieldservice.dto.FieldRequestDto;
 import com.fl.fieldservice.entity.Field;
 import com.fl.fieldservice.entity.Image;
+import com.fl.fieldservice.enumTypes.AreaType;
+import com.fl.fieldservice.enumTypes.SurfaceType;
 import com.fl.fieldservice.repository.FieldRepository;
 import com.fl.fieldservice.service.FieldService;
 import com.fl.fieldservice.service.ImageService;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 //What your mobile app or frontend talks to via HTTP
 //Uses the Service layer to return data
@@ -65,4 +69,22 @@ public class FieldController {
 
         return ResponseEntity.ok(exists); //true if it exists, false if not
     }
+
+    @PostMapping("/createField")
+    public ResponseEntity<Map<String, Object>> createField(@RequestBody FieldRequestDto fieldDTO) {
+        try {
+            Long id = fieldService
+                    .createField(fieldDTO.getName(), fieldDTO.getCity(), fieldDTO.getAddress(), fieldDTO.getPhone(), fieldDTO.getEmail(), fieldDTO.isFree(), fieldDTO.getPitchType())
+                    .orElseThrow(() -> new RuntimeException("Error in creation of field"));
+
+            return ResponseEntity.ok(Map.of("success", true, "data", id));
+        } catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/updateField")
+    public ResponseEntity<Long> updateField(
+    )
 }

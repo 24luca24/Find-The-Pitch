@@ -67,4 +67,8 @@ public class FieldService {
     public Optional<Field> findByNameCityAddress(String fieldName, String city, String address) {
         return fieldRepository.findByNameCityAddress(fieldName, city, address);
     }
+
+    public Optional<Object> createField(String name, String city, String address, String phone, String mail, boolean isFree, String pitchType) {
+        return fieldRepository.createField(name, city, address, phone, mail, isFree, pitchType);
+    }
 }
