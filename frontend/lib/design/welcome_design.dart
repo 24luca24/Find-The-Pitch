@@ -39,7 +39,7 @@ class WelcomeDesign extends StatelessWidget {
                 const Text(
                   "Welcome to Find the Pitch!",
                   style: TextStyle(
-                    fontSize: 56,
+                    fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     shadows: [

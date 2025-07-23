@@ -21,7 +21,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
   String? _createdFieldId;
 
   //Handle page management (Add field has 2 page, one with mandatory fields, one with optional ones)
-  final PageController _pageController = PageController();
+  late PageController _pageController = PageController();
   int _currentPage = 0;
 
   //Validate form input for each step
@@ -53,19 +53,25 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
   final List<File> _images = [];
 
   //Method to change page: move from step 1 to step 2 if form is valid and submit everything if already on step 2
-  void _nextPage() {
-    if(_currentPage == 0) {
-      _continueFromMandatoryFields();
-      _pageController.animateToPage(_currentPage + 1, duration: Duration(milliseconds: 300), curve: Curves.ease);
-      setState(() {
-        _currentPage = 1;
-      });
+  Future<void> _nextPage() async {
+    if (_currentPage == 0) {
+      final success = await _continueFromMandatoryFields();
+      if (success) {
+        setState(() {
+          _currentPage = 1;
+        });
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.ease,
+        );
+      }
     }
   }
 
   //Function to validate the first part of the form and create a field
   //Stores the created field's ID needed for uploading images in step 2
-  Future<void> _continueFromMandatoryFields() async {
+  Future<bool> _continueFromMandatoryFields() async {
     if (_formKeyMandatory.currentState?.validate() ?? false) {
       try {
         final createdField = await FieldService.createField(
@@ -82,10 +88,15 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
           _createdFieldId = createdField.id;
         });
 
+        return true; //success
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating field: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error creating field: $e')),
+        );
+        return false; //failure
       }
     }
+    return false; //form validation failed
   }
 
   //Function to update the instance field created (adding optional fields)
@@ -123,11 +134,15 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
 
   //Method to go from step 2 to step 1
   void _previousPage() {
-    if(_currentPage == 1) {
-      _pageController.animateToPage(_currentPage - 1, duration: Duration(milliseconds: 300), curve: Curves.ease);
+    if (_currentPage == 1) {
       setState(() {
         _currentPage = 0;
       });
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
     }
   }
 
@@ -251,6 +266,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
         children: [
           const SizedBox(
             width: 90,
+            height: 16,
             child: Text(
               "City:",
               style: TextStyle(color: Colors.white, fontSize: 16),
@@ -316,6 +332,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
   void initState() {
     super.initState();
     _autocompleteCityController = TextEditingController();
+    _pageController = PageController();
   }
 
   //Release resources of used elements
@@ -334,54 +351,57 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
   }
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: _currentPage == 0
-        ? MandatoryFieldsForm(
-          formKey: _formKeyMandatory,
-          nameController: _nameController,
-          autocompleteCityController: _autocompleteCityController,
-          autocompleteCityFieldBuilder: _buildAutocompleteCityField,
-          addressController: _addressController,
-          phoneController: _phoneController,
-          mailController: _mailController,
-          isFree: _isFree,
-          pitchType: _pitchType,
-          onIsFreeChanged: _handleIsFreeChanged,
-          onPitchTypeChanged: _handlePitchTypeChanged,
-        )
-        : OptionalFieldsForm(
-          formKey: _formKeyOptional,
-          descriptionController: _descriptionController,
-          websiteController: _websiteController,
-          canShower: _canShower,
-          hasParking: _hasParking,
-          hasLighting: _hasLighting,
-          openingTime: _openingTime,
-          lunchBrakeStart: _lunchBrakeStart,
-          lunchBrakeEnd: _lunchBrakeEnd,
-          closingTime: _closingTime,
-          priceController: _priceController,
-          surfaceType: _surfaceType,
-          areaType: _areaType,
-          images: _images,
-          onCanShowerChanged: _handleCanShowerChanged,
-          onHasParkingChanged: _handleHasParkingChanged,
-          onHasLightingChanged: _handleHasLightningChanged,
-          onOpeningTimeChanged:_handleOpeningTimeChanged,
-          onLunchBrakeStartChanged: _handleLunchBrakeStartChanged,
-          onLunchBrakeEndChanged: _handleLunchBrakeEndChanged,
-          onClosingTimeChanged: _handleClosingTimeChanged,
-          onSurfaceTypeChanged: _handleSurfaceTypeChanged,
-          onAreaTypeChanged: _handleAreaChanged,
-          onAddImage: _handleAddImage,
-      ),
-      bottomNavigationBar: Row(
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
-          if(_currentPage == 1)
-            TextButton(onPressed: _previousPage, child: Text('Back')),
-          Spacer(),
-          TextButton(onPressed: _nextPage, child: Text(_currentPage == 0 ? 'Continue' : 'Submit')),
+          // Page 0: Mandatory Fields Form
+          MandatoryFieldsForm(
+            formKey: _formKeyMandatory,
+            nameController: _nameController,
+            autocompleteCityController: _autocompleteCityController,
+            autocompleteCityFieldBuilder: _buildAutocompleteCityField,
+            addressController: _addressController,
+            phoneController: _phoneController,
+            mailController: _mailController,
+            isFree: _isFree,
+            pitchType: _pitchType,
+            onIsFreeChanged: _handleIsFreeChanged,
+            onPitchTypeChanged: _handlePitchTypeChanged,
+            onContinuePressed: _nextPage,
+            onBackPressed: _previousPage,
+            customCityField: _buildAutocompleteCityField(),
+          ),
+
+          // Page 1: Optional Fields Form
+          OptionalFieldsForm(
+            formKey: _formKeyOptional,
+            descriptionController: _descriptionController,
+            websiteController: _websiteController,
+            canShower: _canShower,
+            hasParking: _hasParking,
+            hasLighting: _hasLighting,
+            openingTime: _openingTime,
+            lunchBrakeStart: _lunchBrakeStart,
+            lunchBrakeEnd: _lunchBrakeEnd,
+            closingTime: _closingTime,
+            priceController: _priceController,
+            surfaceType: _surfaceType,
+            areaType: _areaType,
+            images: _images,
+            onCanShowerChanged: _handleCanShowerChanged,
+            onHasParkingChanged: _handleHasParkingChanged,
+            onHasLightingChanged: _handleHasLightningChanged,
+            onOpeningTimeChanged: _handleOpeningTimeChanged,
+            onLunchBrakeStartChanged: _handleLunchBrakeStartChanged,
+            onLunchBrakeEndChanged: _handleLunchBrakeEndChanged,
+            onClosingTimeChanged: _handleClosingTimeChanged,
+            onSurfaceTypeChanged: _handleSurfaceTypeChanged,
+            onAreaTypeChanged: _handleAreaChanged,
+            onAddImage: _handleAddImage,
+          ),
         ],
       ),
     );

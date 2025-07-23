@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/register_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // <-- Important
 import 'package:frontend/screens/welcome_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(); // <-- Ensure this is called BEFORE accessing env vars
 
-  //Function that lunch the app -> takes a widget (UI component) and renders it on the screen
   runApp(const MyApp());
 }
 
-//StateLess Widget -> its content does not change
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

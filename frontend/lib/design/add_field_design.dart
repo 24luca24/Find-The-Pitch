@@ -4,10 +4,15 @@ import 'package:frontend/constants/area_type.dart';
 import 'package:frontend/constants/pitch_type.dart';
 import 'package:frontend/constants/surface_type.dart';
 
+import '../constants/image_path.dart';
+import '../widgets/primary_button.dart';
+
 class MandatoryFieldsForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
 
   //Mandatory Fields
+  final VoidCallback onContinuePressed;
+  final VoidCallback onBackPressed;
   final TextEditingController nameController;
   final Widget Function() autocompleteCityFieldBuilder;
   final TextEditingController autocompleteCityController;
@@ -18,6 +23,7 @@ class MandatoryFieldsForm extends StatelessWidget {
   final ValueChanged<bool?> onIsFreeChanged;
   final PitchType? pitchType;
   final ValueChanged<PitchType?> onPitchTypeChanged;
+  final Widget? customCityField;
 
   const MandatoryFieldsForm({
     super.key,
@@ -32,157 +38,232 @@ class MandatoryFieldsForm extends StatelessWidget {
     required this.pitchType,
     required this.onIsFreeChanged,
     required this.onPitchTypeChanged,
+    required this.onContinuePressed,
+    required this.onBackPressed,
+    required this.customCityField,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 3.5,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Name'),
-                  validator: validatorName,
+    return Stack(
+      children: [
+        // Background
+        Opacity(
+          opacity: 0.9,
+          child: Image.asset(
+            ImagePath.background_registration, //TODO: change image
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+        ),
+
+        // Back button
+        Positioned(
+          top: 40,
+          left: 16,
+          child: GestureDetector(
+            onTap: onBackPressed,
+            child: const Icon(Icons.arrow_back, color: Colors.white),
+          ),
+        ),
+
+        // Form content
+        Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 450),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildLabeledField("Name", nameController, validator: validatorName),
+                    customCityField ?? _buildLabeledField("City", autocompleteCityController),
+                    _buildLabeledField("Address", addressController, validator: validatorAddress),
+                    _buildLabeledField("Phone", phoneController, validator: validatorPhone),
+                    _buildLabeledField("Email", mailController, validator: validatorMail),
+                    const SizedBox(height: 12),
+
+                    _buildDropdown(),
+
+                    const SizedBox(height: 12),
+                    _buildRadioGroup(),
+
+                    const SizedBox(height: 24),
+                    PrimaryButton(
+                      text: "Continue",
+                      onPressed: () {
+                        FocusScope.of(context).unfocus(); // Hide keyboard
+                        if (formKey.currentState!.validate()) {
+                          onContinuePressed();
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                TextFormField(
-                  controller: autocompleteCityController,
-                  decoration: const InputDecoration(labelText: 'City'),
-                  validator: validatorAutocompletionCity,
-                ),
-                TextFormField(
-                  controller: addressController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                  validator: validatorAddress,
-                ),
-                TextFormField(
-                  controller: phoneController,
-                  decoration: const InputDecoration(labelText: 'Phone'),
-                  validator: validatorPhone,
-                ),
-                TextFormField(
-                  controller: mailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  validator: validatorMail,
-                ),
-                DropdownButtonFormField<PitchType>(
-                  value: pitchType,
-                  decoration: const InputDecoration(labelText: 'Pitch Type'),
-                  items: PitchType.values.map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(type.name),
-                    );
-                  }).toList(),
-                  onChanged: onPitchTypeChanged,
-                  validator: (value) =>
-                  value == null ? 'Select pitch type' : null,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Is Free?'),
-                  Row(
-                    children: [
-                      Radio<bool>(
-                        value: true,
-                        groupValue: isFree,
-                        onChanged: onIsFreeChanged,
-                      ),
-                      const Text('Yes'),
-                      Radio<bool>(
-                        value: false,
-                        groupValue: isFree,
-                        onChanged: onIsFreeChanged,
-                      ),
-                      const Text('No'),
-                    ],
-                  ),
-                ],
               ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLabeledField(
+      String label,
+      TextEditingController controller, {
+        bool obscure = false,
+        String? Function(String?)? validator,
+      }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 90,
+            child: Text(
+              "$label:",
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              obscureText: obscure,
+              validator: validator,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.black.withOpacity(0.3),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdown() {
+    return DropdownButtonFormField<PitchType>(
+      value: pitchType,
+      dropdownColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: "Pitch Type",
+        labelStyle: const TextStyle(color: Colors.white),
+        filled: true,
+        fillColor: Colors.black.withOpacity(0.3),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      items: PitchType.values.map((type) {
+        return DropdownMenuItem(
+          value: type,
+          child: Text(type.name, style: const TextStyle(color: Colors.white)),
+        );
+      }).toList(),
+      onChanged: onPitchTypeChanged,
+      validator: (value) => value == null ? 'Select pitch type' : null,
+    );
+  }
+
+  Widget _buildRadioGroup() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Is Free?', style: TextStyle(color: Colors.white)),
+        Row(
+          children: [
+            Radio<bool>(
+              value: true,
+              groupValue: isFree,
+              onChanged: onIsFreeChanged,
+            ),
+            const Text('Yes', style: TextStyle(color: Colors.white)),
+            Radio<bool>(
+              value: false,
+              groupValue: isFree,
+              onChanged: onIsFreeChanged,
+            ),
+            const Text('No', style: TextStyle(color: Colors.white)),
           ],
         ),
-      ),
+      ],
     );
   }
 }
 
-  String? validatorName(String? name) {
-    if (name == null || name
-        .trim()
-        .isEmpty) {
-      return 'Name is required';
-    }
-    return null;
-  }
+  //VALIDATORS
 
-  String? validatorAutocompletionCity(String? city) {
-    if (city == null || city
-        .trim()
-        .isEmpty) {
-      return 'City is required';
-    }
-    return null;
-  }
-
-  String? validatorAddress(String? address) {
-    if (address == null || address
-        .trim()
-        .isEmpty) {
-      return 'Address is required';
-    }
-    final hasNumber = RegExp(r'\d').hasMatch(address);
-    if (!hasNumber) {
-      return 'Address must contain a number (street number)';
-    }
-    return null;
-  }
-
-  String? validatorPhone(String? phone) {
-    if (phone == null || phone
-        .trim()
-        .isEmpty) {
-      return 'Phone is required';
+    //Name
+    String? validatorName(String? name) {
+      if (name == null || name
+          .trim()
+          .isEmpty) {
+        return 'Name is required';
+      }
+      return null;
     }
 
-    //Check that it contains only digits (optional + at start)
-    final isValid = RegExp(r'^\+?[0-9]{7,15}$').hasMatch(phone);
-    if (!isValid) {
-      return 'Phone must contain only numbers and an optional +';
-    }
-    return null;
-  }
-
-
-  String? validatorMail(String? mail) {
-    if (mail == null || mail
-        .trim()
-        .isEmpty) {
-      return 'Email is required';
+    //City
+    String? validatorAutocompletionCity(String? city) {
+      if (city == null || city
+          .trim()
+          .isEmpty) {
+        return 'City is required';
+      }
+      return null;
     }
 
-    final isValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(mail);
-    if (!isValid) {
-      return 'Enter a valid email address';
+    //Address
+    String? validatorAddress(String? address) {
+      if (address == null || address
+          .trim()
+          .isEmpty) {
+        return 'Address is required';
+      }
+      final hasNumber = RegExp(r'\d').hasMatch(address);
+      if (!hasNumber) {
+        return 'Address must contain a number (street number)';
+      }
+      return null;
     }
-    return null;
-  }
+
+    //Phone
+    String? validatorPhone(String? phone) {
+      if (phone == null || phone
+          .trim()
+          .isEmpty) {
+        return 'Phone is required';
+      }
+
+      //Check that it contains only digits (optional + at start)
+      final isValid = RegExp(r'^\+?[0-9]{7,15}$').hasMatch(phone);
+      if (!isValid) {
+        return 'Phone must contain only numbers and an optional +';
+      }
+      return null;
+    }
+
+    //Mail
+    String? validatorMail(String? mail) {
+      if (mail == null || mail
+          .trim()
+          .isEmpty) {
+        return 'Email is required';
+      }
+
+      final isValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(mail);
+      if (!isValid) {
+        return 'Enter a valid email address';
+      }
+      return null;
+    }
 
 class OptionalFieldsForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -389,7 +470,29 @@ class OptionalFieldsForm extends StatelessWidget {
             ),
 
             const SizedBox(height: 24),
-            // The submit button should be in your screen widget for better control
+
+            // Buttons Row: Back and Save
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.pop(context),
+                  tooltip: 'Back',
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      // Save logic here or callback to parent
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Optional fields saved')),
+                      );
+                    }
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
