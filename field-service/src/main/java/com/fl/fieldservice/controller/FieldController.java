@@ -1,15 +1,12 @@
 package com.fl.fieldservice.controller;
 
 import com.fl.fieldservice.dto.FieldRequestDto;
+import com.fl.fieldservice.dto.FieldUpdateDto;
 import com.fl.fieldservice.entity.Field;
 import com.fl.fieldservice.entity.Image;
-import com.fl.fieldservice.enumTypes.AreaType;
-import com.fl.fieldservice.enumTypes.SurfaceType;
-import com.fl.fieldservice.repository.FieldRepository;
 import com.fl.fieldservice.service.FieldService;
 import com.fl.fieldservice.service.ImageService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -35,14 +31,6 @@ public class FieldController {
     public FieldController(FieldService fieldService, ImageService imageService) {
         this.fieldService = fieldService;
         this.imageService = imageService;
-    }
-
-    @PostMapping(value = "/addField", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Field> addField(
-            @RequestPart("field") @Valid FieldRequestDto request,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
-        Field saved = fieldService.addField(request, images);
-        return ResponseEntity.ok(saved);
     }
 
     @PostMapping("/uploadImages")
@@ -70,21 +58,36 @@ public class FieldController {
         return ResponseEntity.ok(exists); //true if it exists, false if not
     }
 
+    //API call to create a field (only mandatory fields)
     @PostMapping("/createField")
     public ResponseEntity<Map<String, Object>> createField(@RequestBody FieldRequestDto fieldDTO) {
         try {
             Long id = fieldService
-                    .createField(fieldDTO.getName(), fieldDTO.getCity(), fieldDTO.getAddress(), fieldDTO.getPhone(), fieldDTO.getEmail(), fieldDTO.isFree(), fieldDTO.getPitchType())
+                    .createField(fieldDTO)
                     .orElseThrow(() -> new RuntimeException("Error in creation of field"));
 
             return ResponseEntity.ok(Map.of("success", true, "data", id));
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", ex.getMessage()));
         }
     }
 
-    @PostMapping("/updateField")
-    public ResponseEntity<Long> updateField(
-    )
+    //API call to update a field (only optional fields)
+    @PutMapping("/updateField/{id}")
+    public ResponseEntity<?> updateField(
+            @PathVariable Long id,
+            @RequestBody FieldUpdateDto dto
+    ) {
+        try {
+            fieldService.updateField(id, dto); // No return value anymore
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("success", false, "message", ex.getMessage()));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Unexpected error: " + ex.getMessage()));
+        }
+    }
 }

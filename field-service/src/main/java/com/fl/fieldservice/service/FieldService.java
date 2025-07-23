@@ -1,16 +1,11 @@
 package com.fl.fieldservice.service;
 
 import com.fl.fieldservice.dto.FieldRequestDto;
+import com.fl.fieldservice.dto.FieldUpdateDto;
 import com.fl.fieldservice.entity.Field;
-import com.fl.fieldservice.entity.Image;
 import com.fl.fieldservice.repository.FieldRepository;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 //Handle logic, like verifying if a field is already saved when trying to save it
@@ -24,42 +19,6 @@ public class FieldService {
         this.fieldRepository = fieldRepository;
     }
 
-    public Field addField(FieldRequestDto fieldRequestDto, List<MultipartFile> images) throws IOException {
-        Field field = new Field();
-        field.setName(fieldRequestDto.getName());
-        field.setDescription(fieldRequestDto.getDescription());
-        field.setCity(fieldRequestDto.getCity());
-        field.setAddress(fieldRequestDto.getAddress());
-        field.setPhone(fieldRequestDto.getPhone());
-        field.setEmail(fieldRequestDto.getEmail());
-        field.setWebsite(fieldRequestDto.getWebsite());
-        field.setCanShower(fieldRequestDto.isCanShower());
-        field.setHasParking(fieldRequestDto.isHasParking());
-        field.setHasLighting(fieldRequestDto.isHasLighting());
-        field.setIsFree(fieldRequestDto.isFree());
-        field.setOpeningTime(fieldRequestDto.getOpeningTime());
-        field.setLunchBrakeStart(fieldRequestDto.getLunchBrakeStartTime());
-        field.setLunchBrakeEnd(fieldRequestDto.getLunchBrakeEndTime());
-        field.setClosingTime(fieldRequestDto.getClosingTime());
-        field.setPrice(fieldRequestDto.getPrice());
-        field.setSurfaceType(fieldRequestDto.getSurfaceType());
-        field.setPitchType(fieldRequestDto.getPitchType());
-        field.setAreaType(fieldRequestDto.getAreaType());
-        if(images != null && !images.isEmpty()) {
-            List<Image> imageEntities = new ArrayList<>();
-            for (MultipartFile file : images) {
-                Image image = new Image();
-                image.setData(file.getBytes());
-                image.setField(field);
-                imageEntities.add(image);
-            }
-            field.setImages(imageEntities);
-        }
-        field.setImages(fieldRequestDto.getImageList());
-
-        return fieldRepository.save(field);
-    }
-
     public Optional<Field> findById(Long fieldId) {
         return fieldRepository.findById(fieldId);
     }
@@ -68,7 +27,49 @@ public class FieldService {
         return fieldRepository.findByNameCityAddress(fieldName, city, address);
     }
 
-    public Optional<Object> createField(String name, String city, String address, String phone, String mail, boolean isFree, String pitchType) {
-        return fieldRepository.createField(name, city, address, phone, mail, isFree, pitchType);
+    public Optional<Long> createField(FieldRequestDto dto) {
+        Field field = new Field();
+        field.setName(dto.getName());
+        field.setCity(dto.getCity());
+        field.setAddress(dto.getAddress());
+        field.setPhone(dto.getPhone());
+        field.setEmail(dto.getEmail());
+        field.setIsFree(dto.isFree());
+        field.setPitchType(dto.getPitchType());
+
+        Field saved = fieldRepository.save(field);
+        return Optional.of(saved.getId());
     }
+
+    public void updateField(Long id, FieldUpdateDto dto) {
+        Field field = fieldRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Field not found"));
+        // Null-safe updates
+        if (dto.getName() != null) field.setName(dto.getName());
+        if (dto.getDescription() != null) field.setDescription(dto.getDescription());
+        if (dto.getCity() != null) field.setCity(dto.getCity());
+        if (dto.getAddress() != null) field.setAddress(dto.getAddress());
+        if (dto.getPhone() != null) field.setPhone(dto.getPhone());
+        if (dto.getEmail() != null) field.setEmail(dto.getEmail());
+        if (dto.getWebsite() != null) field.setWebsite(dto.getWebsite());
+
+        if (dto.getCanShower() != null) field.setCanShower(dto.getCanShower());
+        if (dto.getHasParking() != null) field.setHasParking(dto.getHasParking());
+        if (dto.getHasLighting() != null) field.setHasLighting(dto.getHasLighting());
+        if (dto.getFree() != null) field.setIsFree(dto.getFree());
+
+        if (dto.getOpeningTime() != null) field.setOpeningTime(dto.getOpeningTime());
+        if (dto.getLunchBrakeStart() != null) field.setLunchBrakeStart(dto.getLunchBrakeStart());
+        if (dto.getLunchBrakeEnd() != null) field.setLunchBrakeEnd(dto.getLunchBrakeEnd());
+        if (dto.getClosingTime() != null) field.setClosingTime(dto.getClosingTime());
+
+        if (dto.getPrice() != null) field.setPrice(dto.getPrice());
+        if (dto.getSurfaceType() != null) field.setSurfaceType(dto.getSurfaceType());
+        if (dto.getPitchType() != null) field.setPitchType(dto.getPitchType());
+        if (dto.getAreaType() != null) field.setAreaType(dto.getAreaType());
+
+        //Save the updated field
+        fieldRepository.save(field);
+    }
+
 }
