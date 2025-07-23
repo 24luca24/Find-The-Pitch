@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:frontend/screens/add_field_screen.dart';
 
 import '../design/map_design.dart';
 
@@ -68,7 +69,7 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-
+  int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,7 +146,17 @@ class _MapScreenState extends State<MapScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
         ],
         onTap: (index) {
-          // TODO: Handle tab change
+          //TODO: complete index routing
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddFieldScreen()),
+            );
+          } else {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
         },
       ),
     );
