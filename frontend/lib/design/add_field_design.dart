@@ -51,7 +51,7 @@ class MandatoryFieldsForm extends StatelessWidget {
         Opacity(
           opacity: 0.9,
           child: Image.asset(
-            ImagePath.background_registration, //TODO: change image
+            ImagePath.background_addField,
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
