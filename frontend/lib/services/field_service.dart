@@ -10,9 +10,7 @@ import 'package:logger/logger.dart';
 
 class FieldService {
 
-  static final String? fieldURL = Platform.isIOS
-      ? dotenv.env['FIELD_URL']
-      : 'http://192.168.49.2:30082';
+  static final fieldURL = dotenv.env['FIELD_URL']!;
 
   //Create a logger instance
   static final Logger logger = Logger();

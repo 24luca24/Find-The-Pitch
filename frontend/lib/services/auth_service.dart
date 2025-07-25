@@ -7,9 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthService {
 
-  static final String? authURL = Platform.isIOS
-      ? dotenv.env['AUTH_URL']
-      : 'http://192.168.1.19:30081';
+  static final authURL = dotenv.env['AUTH_URL']!;
 
   // Create a logger instance
   static final Logger logger = Logger();

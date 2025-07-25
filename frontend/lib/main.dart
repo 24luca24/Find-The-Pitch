@@ -4,7 +4,7 @@ import 'package:frontend/screens/welcome_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(); // <-- Ensure this is called BEFORE accessing env vars
+  await dotenv.load(fileName: ".env"); // <-- Ensure this is called BEFORE accessing env vars
 
   runApp(const MyApp());
 }
