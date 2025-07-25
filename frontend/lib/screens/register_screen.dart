@@ -12,32 +12,70 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+
   final _formKey = GlobalKey<FormState>();
 
+  //Input controllers
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _cityController = TextEditingController();
+
+  //Declaring individual keys for validate fields
+  final _usernameFieldKey = GlobalKey<FormFieldState>();
+  final _emailFieldKey = GlobalKey<FormFieldState>();
+  final _passwordFieldKey = GlobalKey<FormFieldState>();
+  final _cityFieldKey = GlobalKey<FormFieldState>();
+
+  //Declaring focus node to trigger error after focus switch from a field to another
+  final _usernameFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _cityFocus = FocusNode();
+
   //late means: I promise this variable will be initialized before I use it.
   late final TextEditingController _autocompleteCityController;
 
-
+  //Toggle loading spinner/UI state
   bool isLoading = false;
+
+  //Store the results of the async username check
   bool usernameAvailable = true;
 
+  //Delay used to fire the username check to reduce API calls while typing
   Timer? _debounce;
 
-  // Regex-based validators
-  bool isValidPassword(String password) {
-    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$');
-    return regex.hasMatch(password);
-  }
+  //Field controls
 
-  bool isValidEmail(String email) {
-    final regex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
-    return regex.hasMatch(email);
-  }
+    //Check if field username is null or contains a name already in the db
+    String? _validateUsername(String? value) {
+      if (value == null || value.isEmpty) return 'Username required';
+      if (!usernameAvailable) return 'Username already taken';
+      return null;
+    }
 
+    //TODO: improve how I check validity of a mail.
+    String? _validateEmail(String? email) {
+      if (email == null || email.isEmpty) return 'Email required';
+      final regex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
+      return (regex.hasMatch(email)) ? null : 'Invalid email format';
+    }
+
+    //Check if password contain 8 character, 1 Uppercase, 1 special character
+    String? _validatePassword(String? password) {
+      if (password == null || password.isEmpty) return 'Password required';
+      final regex = RegExp(r'^(?=.*[A-Z])(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$');
+      return (regex.hasMatch(password)) ? null :'Min 8 chars, 1 uppercase, 1 special char';
+    }
+
+    //Only check if there is something in the controller since city are preloaded from db
+    String? _validateCity(String? value) {
+      if (value == null || value.isEmpty) return 'City required';
+      return null;
+    }
+
+  //Function to be called on the register button. Check if all field are valid,
+  //call the Authservice -> the API and send to the db the data.
   void _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() => isLoading = true);
@@ -66,29 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  String? _validateUsername(String? value) {
-    if (value == null || value.isEmpty) return 'Username required';
-    if (!usernameAvailable) return 'Username already taken';
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Email required';
-    return isValidEmail(value) ? null : 'Invalid email format';
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) return 'Password required';
-    return isValidPassword(value)
-        ? null
-        : 'Min 8 chars, 1 uppercase, 1 special char';
-  }
-
-  String? _validateCity(String? value) {
-    if (value == null || value.isEmpty) return 'City required';
-    return null;
-  }
-
+  //Initialize autocomplete field, timer and error state
   @override
   void initState() {
     super.initState();
@@ -97,30 +113,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _cityController.text = _autocompleteCityController.text;
     });
 
-    _usernameController.addListener(() {
-      // Trigger immediate validation for the username field (to clear old errors while waiting)
-      _formKey.currentState?.validate();
+    //Attach debounce to username text changes (this run every 500 millisecond)
+    // _usernameController.addListener(() {
+    //   if (_debounce?.isActive ?? false) _debounce!.cancel();
+    //   _debounce = Timer(const Duration(milliseconds: 500), () {
+    //     _checkUsernameAsync();
+    //   });
+    // });
 
-      if (_debounce?.isActive ?? false) _debounce!.cancel();
-      _debounce = Timer(const Duration(milliseconds: 500), () {
+    //This run after the focus change
+    _usernameFocus.addListener(() {
+      if (!_usernameFocus.hasFocus) {
+        _usernameFieldKey.currentState?.validate();
+        // Optional: Trigger username check on blur too (no debounce here)
         _checkUsernameAsync();
-      });
+      }
+    });
+
+    _emailFocus.addListener((){
+      if(!_emailFocus.hasFocus) {
+        _emailFieldKey.currentState?.validate();
+      }
+    });
+
+    _passwordFocus.addListener((){
+      if(!_passwordFocus.hasFocus) {
+      _passwordFieldKey.currentState?.validate();
+      }
+    });
+
+    _cityFocus.addListener((){
+      if(!_cityFocus.hasFocus) {
+        _cityFieldKey.currentState?.validate();
+      }
     });
   }
 
+  //Check if username already exist in the db
   Future<void> _checkUsernameAsync() async {
     final name = _usernameController.text;
     if (name.isNotEmpty) {
-      final available = await AuthService.checkUsernameAvailable(name);
-      if (mounted) {
-        setState(() => usernameAvailable = available);
+      try {
+        final available = await AuthService.checkUsernameAvailable(name);
+        if (mounted) {
+          usernameAvailable = available;
 
-        //Trigger form validation to show errors
-        _formKey.currentState?.validate();
+          //Trigger form validation to show errors
+          setState(() {
+            _usernameFieldKey.currentState?.validate();
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            usernameAvailable = false; //Assume non-available if API fails
+          });
+
+          setState(() {
+            _usernameFieldKey.currentState?.validate();
+          });
+
+        }
       }
+
     }
   }
 
+  //Widget to create autocomplete city field
   Widget _buildAutocompleteCityField() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -167,7 +226,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.3),
+                    fillColor: Colors.black.withValues(alpha: 0.3),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -181,6 +240,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  //Prevent memory leak
   @override
   void dispose() {
     _autocompleteCityController.dispose();
@@ -192,24 +252,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  //Handles design, classing the design class constructor
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Form(
         key: _formKey,
         child: RegistrationDesign(
-          onLoginPressed: () => Navigator.pop(context),
+          onBackPressed: () => Navigator.pop(context),
           onRegisterPressed: _register,
           usernameController: _usernameController,
           emailController: _emailController,
           passwordController: _passwordController,
           cityController: _cityController,
           isLoading: isLoading,
-          usernameValidator: _validateUsername,
-          emailValidator: _validateEmail,
-          passwordValidator: _validatePassword,
-          cityValidator: _validateCity,
           customCityField: _buildAutocompleteCityField(),
+          usernameFocusNode: _usernameFocus,
+          passwordFocusNode: _passwordFocus,
+          cityFocusNode: _cityFocus,
+          emailFocusNode: _emailFocus,
+          usernameValidator: _validateUsername,
+          passwordValidator: _validatePassword,
+          emailValidator: _validateEmail,
+          cityValidator: _validateCity,
+          usernameFieldKey: _usernameFieldKey,
+          passwordFieldKey: _passwordFieldKey,
+          emailFieldKey: _emailFieldKey,
+          cityFieldKey: _cityFieldKey,
         ),
       ),
     );

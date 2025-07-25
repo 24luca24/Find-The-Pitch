@@ -73,7 +73,7 @@ flutter:
     - assets/images/welcome_background.jpg
     - assets/images/background_registration.jpg
     - assets/images/background_login.jpg
-    - assets/images/background_addField
+    - assets/images/background_addField.jpg
     - .env
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

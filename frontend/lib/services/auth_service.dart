@@ -97,14 +97,31 @@ class AuthService {
 
   //Check availability of username
   static Future<bool> checkUsernameAvailable(String username) async {
-    final response = await http.get(
-        Uri.parse('$authURL/users/check-username?name=$username'));
-    if (response.statusCode == 200) {
-      return response.body == 'true';
-    } else {
-      final errorMsg = jsonDecode(response.body)['message'] ?? 'Registration failed';
-      logger.e('Registration failed: $errorMsg');
-      throw Exception('Failed to check username');
+    try {
+      final response = await http.get(
+        Uri.parse('$authURL/users/check-username?name=$username'),
+      );
+
+      if (response.statusCode == 200) {
+        return response.body == 'true';
+      } else {
+        String errorMsg;
+
+        try {
+          final decoded = jsonDecode(response.body);
+          errorMsg = decoded['message'] ?? 'Unknown error';
+        } catch (_) {
+          errorMsg = 'Non-JSON response: ${response.body}';
+        }
+
+        logger.e('Registration failed: $errorMsg');
+        throw Exception('Failed to check username: $errorMsg');
+      }
+    } catch (e, stackTrace) {
+      logger.e('Exception in checkUsernameAvailable: $e');
+      logger.e('Stack trace: $stackTrace');
+      rethrow;
     }
   }
+
 }
