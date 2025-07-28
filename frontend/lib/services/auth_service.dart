@@ -99,11 +99,11 @@ class AuthService {
   static Future<bool> checkUsernameAvailable(String username) async {
     try {
       final response = await http.get(
-        Uri.parse('$authURL/users/check-username?name=$username'),
+        Uri.parse('$authURL/api/users/check-username?name=$username'),
       );
 
       if (response.statusCode == 200) {
-        return response.body == 'true';
+        return response.body.trim().toLowerCase() == 'true';
       } else {
         String errorMsg;
 
@@ -123,5 +123,4 @@ class AuthService {
       rethrow;
     }
   }
-
 }

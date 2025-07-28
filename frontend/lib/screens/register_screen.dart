@@ -124,9 +124,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     //This run after the focus change
     _usernameFocus.addListener(() {
       if (!_usernameFocus.hasFocus) {
-        _usernameFieldKey.currentState?.validate();
-        // Optional: Trigger username check on blur too (no debounce here)
-        _checkUsernameAsync();
+        () async {
+          await _checkUsernameAsync();
+        }();
       }
     });
 
