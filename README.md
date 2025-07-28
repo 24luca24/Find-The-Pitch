@@ -17,8 +17,29 @@ The backend services are developed using **Spring Boot**.
 ### Prerequisites
 
 - Java 21 (for Spring Boot services)
-- Flutter SDK (for the frontend)
+  ```bash
+  brew install openjdk@21
+  
+- Flutter SDK and dependencies
 - Maven
+  ```bash
+  brew install maven
+  
+- Minikube
+  ```bash
+  brew install minikube
+  
+- kubectl
+  ```bash
+  brew install kubectl
+  
+- Xcode + Simulator
+  ```bash
+  Install from Appstore + xcode-select-install
+  
+- Docker desktop
+  ```bash
+  brew install docker
 
 ### Installation and Running
 
@@ -28,13 +49,13 @@ The backend services are developed using **Spring Boot**.
    git clone <repository-url>
    cd Find-The-Pitch
 
-2. Navigate into **each microservice directory** (authentication-service and field-service) and
+2. Navigate into **Find-The-Pitch** folder and
 
    ```bash
-   ./mvnw spring-boot:run
+   ./start.sh
 
-3. Run frontend; from the root of the project type:
+3. Run frontend: from the root of the project type:
 
    ```bash
    cd frontend
-   flutter run
+   ./startAll.sh
