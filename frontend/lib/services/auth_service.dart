@@ -123,4 +123,33 @@ class AuthService {
       rethrow;
     }
   }
+
+  //Check availability of email
+  static Future<bool> checkEmailAvailable(String email) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$authURL/api/users/check-email?email=$email'),
+      );
+
+      if (response.statusCode == 200) {
+        return response.body.trim().toLowerCase() == 'true';
+      } else {
+        String errorMsg;
+
+        try {
+          final decoded = jsonDecode(response.body);
+          errorMsg = decoded['message'] ?? 'Unknown error';
+        } catch (_) {
+          errorMsg = 'Non-JSON response: ${response.body}';
+        }
+
+        logger.e('Registration failed: $errorMsg');
+        throw Exception('Failed to check username: $errorMsg');
+      }
+    } catch (e, stackTrace) {
+      logger.e('Exception in checkUsernameAvailable: $e');
+      logger.e('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
 }

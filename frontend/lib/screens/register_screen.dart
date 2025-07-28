@@ -39,8 +39,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //Toggle loading spinner/UI state
   bool isLoading = false;
 
-  //Store the results of the async username check
+  //Store the results of the async username/mail check
   bool usernameAvailable = true;
+  bool emailAvailable = true;
 
   //Delay used to fire the username check to reduce API calls while typing
   Timer? _debounce;
@@ -54,14 +55,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return null;
     }
 
-    //TODO: improve how I check validity of a mail.
     String? _validateEmail(String? email) {
       if (email == null || email.isEmpty) return 'Email required';
-      final regex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
-      return (regex.hasMatch(email)) ? null : 'Invalid email format';
+
+      final regex = RegExp(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+
+      if (!regex.hasMatch(email)) return 'Invalid email format';
+      if (!emailAvailable) return 'Email already in use';
+
+      return null;
     }
 
-    //Check if password contain 8 character, 1 Uppercase, 1 special character
+  //Check if password contain 8 character, 1 Uppercase, 1 special character
     String? _validatePassword(String? password) {
       if (password == null || password.isEmpty) return 'Password required';
       final regex = RegExp(r'^(?=.*[A-Z])(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$');
@@ -82,11 +87,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       try {
         bool success = await AuthService.register(
-          username: _usernameController.text,
-          email: _emailController.text,
-          password: _passwordController.text,
-          city: _cityController.text,
+          username: _usernameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          city: _cityController.text.trim(),
         );
+
+        if(!mounted) return;
 
         if (success) {
           Navigator.pushReplacement(
@@ -95,11 +102,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
         }
       } catch (e) {
+        if(!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
         );
       } finally {
-        setState(() => isLoading = false);
+        if (mounted) {
+          setState(() => isLoading = false);
+        }
       }
     }
   }
@@ -132,7 +142,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     _emailFocus.addListener((){
       if(!_emailFocus.hasFocus) {
-        _emailFieldKey.currentState?.validate();
+         () async {
+           await _checkEmailAsync();
+         } ();
       }
     });
 
@@ -151,7 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   //Check if username already exist in the db
   Future<void> _checkUsernameAsync() async {
-    final name = _usernameController.text;
+    final name = _usernameController.text.trim();
     if (name.isNotEmpty) {
       try {
         final available = await AuthService.checkUsernameAvailable(name);
@@ -172,10 +184,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
           setState(() {
             _usernameFieldKey.currentState?.validate();
           });
-
         }
       }
+    }
+  }
 
+  //Check if email already exist in the db
+  Future<void> _checkEmailAsync() async {
+    final email = _emailController.text.trim();
+    if (email.isNotEmpty) {
+      try {
+        final available = await AuthService.checkEmailAvailable(email);
+        if (mounted) {
+          emailAvailable = available;
+
+          setState(() {
+            _emailFieldKey.currentState?.validate();
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            emailAvailable = false;
+          });
+
+          setState(() {
+            _emailFieldKey.currentState?.validate();
+          });
+        }
+      }
     }
   }
 

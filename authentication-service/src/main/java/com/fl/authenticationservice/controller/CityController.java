@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/cities")
 public class CityController {
-
     private final CityRepository cityRepository;
 
     public CityController(CityRepository cityRepository) {

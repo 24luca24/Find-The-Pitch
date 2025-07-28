@@ -18,13 +18,14 @@ public class UserController {
     }
 
     @GetMapping("/check-username")
-    public ResponseEntity<String> checkUsername(@RequestParam String name) {
-        try {
-            boolean exist = userRepository.existsByUsername(name);
-            return ResponseEntity.ok(Boolean.toString(!exist));
-        } catch (Exception e) {
-            e.printStackTrace();  // log to console
-            return ResponseEntity.status(500).body("Error: " + e.getMessage());
-        }
+    public ResponseEntity<Boolean> checkUsername(@RequestParam String name) {
+        boolean exist = userRepository.existsByUsername(name);
+        return ResponseEntity.ok(!exist);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exist = userRepository.existsByEmail(email.toLowerCase());
+        return ResponseEntity.ok(!exist);
     }
 }
