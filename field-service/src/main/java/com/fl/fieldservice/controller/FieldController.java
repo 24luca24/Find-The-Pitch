@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +34,7 @@ public class FieldController {
         this.imageService = imageService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/uploadImages")
     public ResponseEntity<?> uploadImages(@RequestParam("images") List<MultipartFile> files, @PathVariable Long fieldId) throws IOException {
         try {
@@ -59,6 +61,7 @@ public class FieldController {
     }
 
     //API call to create a field (only mandatory fields)
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/createField")
     public ResponseEntity<Map<String, Object>> createField(@RequestBody FieldRequestDto fieldDTO) {
         try {
@@ -74,6 +77,7 @@ public class FieldController {
     }
 
     //API call to update a field (only optional fields)
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/updateField/{id}")
     public ResponseEntity<?> updateField(
             @PathVariable Long id,

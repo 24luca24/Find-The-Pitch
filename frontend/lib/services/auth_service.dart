@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthService {
 
@@ -67,6 +68,7 @@ class AuthService {
     return false;
   }
 
+  //Token section
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('jwt_token');
@@ -75,6 +77,26 @@ class AuthService {
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
+  }
+
+  static Future<Map<String, String>> getAuthHeaders() async {
+    final token = await getToken();
+    return {
+      "Content-Type": "application/json",
+      if (token != null) "Authorization": "Bearer $token",
+    };
+  }
+
+  //To check whether someone is logged or not
+  static Future<bool> isLoggedIn() async {
+    final token = await getToken();
+    return token != null;
+  }
+
+  static Future<bool> isTokenExpired() async {
+    final token = await getToken();
+    if (token == null) return true;
+    return JwtDecoder.isExpired(token);
   }
 
   //To retrieve city for autocompletion
@@ -151,5 +173,23 @@ class AuthService {
       logger.e('Stack trace: $stackTrace');
       rethrow;
     }
+  }
+
+  //Centralized authenticated GET request
+  static Future<http.Response> authenticatedGet(String path) async {
+    final headers = await getAuthHeaders();
+    final url = Uri.parse('$authURL$path');
+    return http.get(url, headers: headers);
+  }
+
+  //Centralized authenticated POST request
+  static Future<http.Response> authenticatedPost(String path, Map<String, dynamic> body) async {
+    final headers = await getAuthHeaders();
+    final url = Uri.parse('$authURL$path');
+    return http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(body),
+    );
   }
 }
