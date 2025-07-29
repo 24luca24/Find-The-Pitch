@@ -11,6 +11,25 @@ class AuthProvider extends ChangeNotifier {
   String? get token => _token;
 
   Future<void> loadToken() async {
-    final storedToken = await
+    final storedToken = await SecureStorage.readToken();
+    if (storedToken != null && storedToken.isNotEmpty && JwtUtils.isTokenExpired(storedToken)) {
+      _token = storedToken;
+      _isLoggedIn = true;
+    }
+    notifyListeners();
+  }
+
+  Future<void> login(String token) async {
+    await SecureStorage.writeToken(token);
+    _token = token;
+    _isLoggedIn = true;
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    await SecureStorage.deleteToken();
+    _token = null;
+    _isLoggedIn = false;
+    notifyListeners();
   }
 }

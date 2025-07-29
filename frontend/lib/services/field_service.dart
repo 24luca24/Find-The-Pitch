@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/constants/area_type.dart';
 import 'package:frontend/constants/pitch_type.dart';
 import 'package:frontend/constants/surface_type.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -43,8 +44,10 @@ class FieldService {
   }
 
   static Future<bool> loadImages() async {
+    final headers = await AuthService.getAuthHeaders();
     final response = await http.get(
-        Uri.parse('$fieldURL/api/fields/uploadImages'));
+        Uri.parse('$fieldURL/api/fields/uploadImages'),
+        headers: headers,);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
@@ -65,9 +68,10 @@ class FieldService {
     required bool isFree,
     PitchType? pitchType,
   }) async {
+    final headers = await AuthService.getAuthHeaders();
     final response = await http.post(
       Uri.parse('$fieldURL/api/fields/createField'),
-      headers: {'Content-Type': 'application/json'},
+      headers: headers,
       body: jsonEncode({
         'name': name,
         'city': city,
@@ -129,9 +133,11 @@ class FieldService {
       'areaType': areaType?.name,
     };
 
+    final headers = await AuthService.getAuthHeaders();
+
     final response = await http.put(
       Uri.parse('$fieldURL/api/fields/$id/updateField'),
-      headers: {'Content-Type': 'application/json'},
+      headers: headers,
       body: jsonEncode(body),
     );
 
