@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/design/login_design.dart';
+import 'package:frontend/screens/map_screen.dart';
 import '../services/auth_service.dart';
-import 'field_management_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   String? error;
 
+  //Function associated to login button, allow to change screen if login is successful
   void _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() => isLoading = true);
@@ -28,16 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
           password: _passwordController.text);
 
       setState(() => isLoading = false);
-
-      if (success) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const FieldManagementScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login failed.")),
-        );
+      if (mounted) {
+        if (success) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MapScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Login failed.")),
+          );
+        }
       }
     }
   }
