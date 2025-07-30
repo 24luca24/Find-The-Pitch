@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/screens/register_screen.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/screens/add_field_screen.dart';
 
@@ -148,10 +152,46 @@ class _MapScreenState extends State<MapScreen> {
         onTap: (index) {
           //TODO: complete index routing
           if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddFieldScreen()),
-            );
+            if(context.read<AuthProvider>().isLoggedIn) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddFieldScreen()),
+              );
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Login Required"),
+                  content: const Text("You need to be logged in to be able to add a field. Would you like to register or log in now?"),
+                  actions: [
+                    TextButton(
+                      child: const Text("Not Now"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    TextButton(
+                      child: const Text("Register"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                            MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                        );
+                      },
+                    ),
+                    TextButton(
+                      child: const Text("Login"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }
           } else {
             setState(() {
               _selectedIndex = index;

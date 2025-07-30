@@ -66,7 +66,7 @@ class RegistrationDesign extends StatelessWidget {
         Opacity(
           opacity: 0.9,
           child: Image.asset(
-            ImagePath.background_registration,
+            ImagePath.backgroundRegistration,
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,

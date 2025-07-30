@@ -29,7 +29,7 @@ class LoginDesign extends StatelessWidget {
         Opacity(
           opacity: 0.9,
           child: Image.asset(
-            ImagePath.background_login,
+            ImagePath.backgroundLogin,
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
@@ -44,7 +44,6 @@ class LoginDesign extends StatelessWidget {
             onPressed: onHomePressed,
           ),
         ),
-
         //Login form
         Center(
           child: SingleChildScrollView(

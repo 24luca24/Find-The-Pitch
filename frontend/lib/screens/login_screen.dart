@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/design/login_design.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/screens/map_screen.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,13 +26,20 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => isLoading = true);
 
+
+
       bool success = await AuthService.login(
           username: _usernameController.text,
           password: _passwordController.text);
 
       setState(() => isLoading = false);
-      if (mounted) {
+
+      if (!mounted) return;
+
         if (success) {
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          await authProvider.loadToken();
+          if(!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const MapScreen()),
@@ -39,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Login failed.")),
           );
-        }
       }
     }
   }

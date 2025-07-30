@@ -1,3 +1,4 @@
+import 'package:frontend/services/secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
@@ -58,12 +59,10 @@ class AuthService {
       final data = jsonDecode(response.body);
       final token = data['token'];
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('jwt_token', token);
+      await SecureStorage.writeToken(token);
 
       return true;
     }
-
     return false;
   }
 

@@ -22,7 +22,7 @@ class WelcomeDesign extends StatelessWidget {
         Opacity(
           opacity: 0.90,
           child: Image.asset(
-            ImagePath.welcome_background, //"assets/images/welcome_background.jpg""
+            ImagePath.welcomeBackground, //"assets/images/welcome_background.jpg""
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
