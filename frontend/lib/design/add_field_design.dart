@@ -12,7 +12,6 @@ class MandatoryFieldsForm extends StatelessWidget {
 
   //Mandatory Fields
   final VoidCallback onContinuePressed;
-  final VoidCallback onBackPressed;
   final TextEditingController nameController;
   final Widget Function() autocompleteCityFieldBuilder;
   final TextEditingController autocompleteCityController;
@@ -39,7 +38,6 @@ class MandatoryFieldsForm extends StatelessWidget {
     required this.onIsFreeChanged,
     required this.onPitchTypeChanged,
     required this.onContinuePressed,
-    required this.onBackPressed,
     required this.customCityField,
   });
 
@@ -63,7 +61,7 @@ class MandatoryFieldsForm extends StatelessWidget {
           top: 40,
           left: 16,
           child: GestureDetector(
-            onTap: onBackPressed,
+            onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back, color: Colors.white),
           ),
         ),
@@ -269,6 +267,7 @@ class OptionalFieldsForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
 
   //Optional Fields
+  final VoidCallback onBackPressed;
   final TextEditingController descriptionController;
   final TextEditingController websiteController;
   final bool canShower;
@@ -321,6 +320,7 @@ class OptionalFieldsForm extends StatelessWidget {
     required this.onSurfaceTypeChanged,
     required this.onAreaTypeChanged,
     required this.onAddImage,
+    required this.onBackPressed,
   });
 
   Future<void> _pickTime(BuildContext context, TimeOfDay? initialTime, ValueChanged<TimeOfDay?> onTimeChanged) async {

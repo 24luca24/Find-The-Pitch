@@ -10,10 +10,8 @@ import java.util.Optional;
 //"I want to get or save data, not how — just let Spring handle it."
 
 @Repository
-public interface FieldRepository extends JpaRepository<Field, Long> {
+public interface FieldRepository extends JpaRepository<Field, Long>, FieldRepositoryCustom {
 
-    Optional<Field> findByNameCityAddress(String fieldName, String city, String address);
-
-    Optional<Long> updateField(Long id, FieldUpdateDto dto);
+    Optional<Field> findByNameAndCityAndAddress(String fieldName, String city, String address);
 
 }

@@ -21,7 +21,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
   String? _createdFieldId;
 
   //Handle page management (Add field has 2 page, one with mandatory fields, one with optional ones)
-  late PageController _pageController = PageController();
+  late final PageController _pageController;
   int _currentPage = 0;
 
   //Validate form input for each step
@@ -256,6 +256,14 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
       }
     }
 
+    //Removing an added image
+    void _removeImage(int index) {
+      setState(() {
+        _images.removeAt(index);
+      });
+    }
+
+
   //Function to autocomplete the city form. Gets city suggestion from AuthService.fetchCitySuggestions(query)
   //Syncs the selected value to _cityController
   Widget _buildAutocompleteCityField() {
@@ -371,7 +379,6 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
             onIsFreeChanged: _handleIsFreeChanged,
             onPitchTypeChanged: _handlePitchTypeChanged,
             onContinuePressed: _nextPage,
-            onBackPressed: _previousPage,
             customCityField: _buildAutocompleteCityField(),
           ),
 
@@ -401,6 +408,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
             onSurfaceTypeChanged: _handleSurfaceTypeChanged,
             onAreaTypeChanged: _handleAreaChanged,
             onAddImage: _handleAddImage,
+            onBackPressed: _previousPage,
           ),
         ],
       ),

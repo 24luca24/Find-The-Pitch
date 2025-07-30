@@ -24,7 +24,7 @@ public class FieldService {
     }
 
     public Optional<Field> findByNameCityAddress(String fieldName, String city, String address) {
-        return fieldRepository.findByNameCityAddress(fieldName, city, address);
+        return fieldRepository.findByNameAndCityAndAddress(fieldName, city, address);
     }
 
     public Optional<Long> createField(FieldRequestDto dto) {
@@ -42,34 +42,7 @@ public class FieldService {
     }
 
     public void updateField(Long id, FieldUpdateDto dto) {
-        Field field = fieldRepository.findById(id)
+        Field updated = fieldRepository.updateField(id, dto)
                 .orElseThrow(() -> new RuntimeException("Field not found"));
-        // Null-safe updates
-        if (dto.getName() != null) field.setName(dto.getName());
-        if (dto.getDescription() != null) field.setDescription(dto.getDescription());
-        if (dto.getCity() != null) field.setCity(dto.getCity());
-        if (dto.getAddress() != null) field.setAddress(dto.getAddress());
-        if (dto.getPhone() != null) field.setPhone(dto.getPhone());
-        if (dto.getEmail() != null) field.setEmail(dto.getEmail());
-        if (dto.getWebsite() != null) field.setWebsite(dto.getWebsite());
-
-        if (dto.getCanShower() != null) field.setCanShower(dto.getCanShower());
-        if (dto.getHasParking() != null) field.setHasParking(dto.getHasParking());
-        if (dto.getHasLighting() != null) field.setHasLighting(dto.getHasLighting());
-        if (dto.getFree() != null) field.setIsFree(dto.getFree());
-
-        if (dto.getOpeningTime() != null) field.setOpeningTime(dto.getOpeningTime());
-        if (dto.getLunchBrakeStart() != null) field.setLunchBrakeStart(dto.getLunchBrakeStart());
-        if (dto.getLunchBrakeEnd() != null) field.setLunchBrakeEnd(dto.getLunchBrakeEnd());
-        if (dto.getClosingTime() != null) field.setClosingTime(dto.getClosingTime());
-
-        if (dto.getPrice() != null) field.setPrice(dto.getPrice());
-        if (dto.getSurfaceType() != null) field.setSurfaceType(dto.getSurfaceType());
-        if (dto.getPitchType() != null) field.setPitchType(dto.getPitchType());
-        if (dto.getAreaType() != null) field.setAreaType(dto.getAreaType());
-
-        //Save the updated field
-        fieldRepository.save(field);
     }
-
 }

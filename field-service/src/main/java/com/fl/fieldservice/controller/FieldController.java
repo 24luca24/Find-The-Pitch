@@ -64,13 +64,16 @@ public class FieldController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/createField")
     public ResponseEntity<Map<String, Object>> createField(@RequestBody FieldRequestDto fieldDTO) {
+        System.out.println("fieldDTO = " + fieldDTO);
         try {
             Long id = fieldService
                     .createField(fieldDTO)
                     .orElseThrow(() -> new RuntimeException("Error in creation of field"));
 
+            System.out.println("done im in the try");
             return ResponseEntity.ok(Map.of("success", true, "data", id));
         } catch (Exception ex) {
+            System.out.println("Error in creation of field. Im in the exception");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", ex.getMessage()));
         }

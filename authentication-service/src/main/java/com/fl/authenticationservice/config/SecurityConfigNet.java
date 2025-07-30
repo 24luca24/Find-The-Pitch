@@ -16,8 +16,8 @@ public class SecurityConfigNet {
         return http
                 .csrf(AbstractHttpConfigurer::disable) //CSRF disabled safely
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() //Public access to your registration endpoint
-                        .anyRequest().authenticated()               //Other routes still require auth (if any)
+                        .requestMatchers("/**").permitAll() //Public access to registration endpoint
+                        .anyRequest().authenticated()
                 )
                 .build();
     }
