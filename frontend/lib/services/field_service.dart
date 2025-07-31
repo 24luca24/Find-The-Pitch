@@ -70,11 +70,6 @@ class FieldService {
     PitchType? pitchType,
   }) async {
     final headers = await AuthService.getAuthHeaders();
-    final token = await SecureStorage.readToken();
-    print('token="$token"');
-    print('fieldURL="$fieldURL"');
-    final fullUrl = '$fieldURL/api/fields/createField';
-    print('Full URL="$fullUrl"');
     final response = await http.post(
       Uri.parse('$fieldURL/api/fields/createField'),
       headers: headers,
