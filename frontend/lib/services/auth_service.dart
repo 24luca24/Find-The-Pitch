@@ -66,7 +66,6 @@ class AuthService {
   }
 
   //Token section
-
   static Future<Map<String, String>> getAuthHeaders() async {
     final token = await SecureStorage.readToken();
     return {

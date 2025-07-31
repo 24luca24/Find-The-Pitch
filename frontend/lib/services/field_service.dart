@@ -80,7 +80,7 @@ class FieldService {
         'phone': phone,
         'mail': mail,
         'isFree': isFree,
-        'pitchType': pitchType?.name, // convert enum to string
+        'pitchType': pitchType?.name.toUpperCase(),
       }),
     );
 
