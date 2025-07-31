@@ -2,13 +2,12 @@ import 'package:frontend/services/secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthService {
 
-  static final authURL = dotenv.env['AUTH_URL']!;
+  static final authURL = dotenv.env['AUTH_URL']?.trim();
 
   // Create a logger instance
   static final Logger logger = Logger();
@@ -67,18 +66,9 @@ class AuthService {
   }
 
   //Token section
-  static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('jwt_token');
-  }
-
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token');
-  }
 
   static Future<Map<String, String>> getAuthHeaders() async {
-    final token = await getToken();
+    final token = await SecureStorage.readToken();
     return {
       "Content-Type": "application/json",
       if (token != null) "Authorization": "Bearer $token",
@@ -87,12 +77,12 @@ class AuthService {
 
   //To check whether someone is logged or not
   static Future<bool> isLoggedIn() async {
-    final token = await getToken();
+    final token = await SecureStorage.readToken();
     return token != null;
   }
 
   static Future<bool> isTokenExpired() async {
-    final token = await getToken();
+    final token = await SecureStorage.readToken();
     if (token == null) return true;
     return JwtDecoder.isExpired(token);
   }

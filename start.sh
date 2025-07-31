@@ -30,7 +30,7 @@ echo "Building Docker images..."
 docker build -t authentication-service:latest ./authentication-service
 docker build -t field-service:latest ./field-service
 
-echo "pplying Kubernetes configs..."
+echo "applying Kubernetes configs..."
 kubectl apply -f k8s/
 
 echo "Waiting for deployments to become ready..."
@@ -45,16 +45,16 @@ pkill -f "kubectl port-forward service/field-service" || true
 
 # Start port-forwarding in background
 kubectl port-forward service/authentication-service 30081:8080 > /dev/null 2>&1 &
-kubectl port-forward service/field-service 30082:8080 > /dev/null 2>&1 &
+kubectl port-forward service/field-service 30082:8081 > /dev/null 2>&1 &
 
 sleep 2  # Give port-forwarding a moment to start
 
-echo "Authentication Service available at: http://localhost:30081"
-echo "Field Service available at:        http://localhost:30082"
+echo "Authentication Service available at: http://127.0.0.1:30081"
+echo "Field Service available at: http://127.0.0.1:30082"
 
-# Optional: update frontend/.env file
-echo "AUTH_URL=http://localhost:30081" > frontend/.env
-echo "FIELD_URL=http://localhost:30082" >> frontend/.env
+# Optional: update frontend/.env file field http://localhost:30082 auth http://localhost:30081
+echo "AUTH_URL=http://127.0.0.1:30081" > frontend/.env
+echo "FIELD_URL=http://127.0.0.1:30082" >> frontend/.env
 
 echo "✅ All services are running and forwarded to localhost!"
 echo "Use these URLs in Flutter when using iOS Simulator."

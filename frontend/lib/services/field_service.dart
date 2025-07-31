@@ -6,12 +6,13 @@ import 'package:frontend/constants/area_type.dart';
 import 'package:frontend/constants/pitch_type.dart';
 import 'package:frontend/constants/surface_type.dart';
 import 'package:frontend/services/auth_service.dart';
+import 'package:frontend/services/secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class FieldService {
 
-  static final fieldURL = dotenv.env['FIELD_URL']!;
+  static final fieldURL = dotenv.env['FIELD_URL']?.trim();
 
   //Create a logger instance
   static final Logger logger = Logger();
@@ -69,6 +70,11 @@ class FieldService {
     PitchType? pitchType,
   }) async {
     final headers = await AuthService.getAuthHeaders();
+    final token = await SecureStorage.readToken();
+    print('token="$token"');
+    print('fieldURL="$fieldURL"');
+    final fullUrl = '$fieldURL/api/fields/createField';
+    print('Full URL="$fullUrl"');
     final response = await http.post(
       Uri.parse('$fieldURL/api/fields/createField'),
       headers: headers,
