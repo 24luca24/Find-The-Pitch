@@ -40,7 +40,7 @@ public class AuthService {
         into a user in the db (hashing the pw)
         Save the new user in the DB and generate a new JWT token for this user (return it)
      */
-    public String register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username is already in use");
@@ -62,7 +62,5 @@ public class AuthService {
         user.setCity(request.getCity());
 
         userRepository.save(user);
-        return jwtService.generateToken(user);
-
     }
 }

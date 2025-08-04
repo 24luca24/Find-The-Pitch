@@ -13,12 +13,10 @@ import com.fl.authenticationservice.dto.RegisterRequest;
 import com.fl.authenticationservice.jwt.JWTService;
 import com.fl.authenticationservice.service.AuthService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,23 +42,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        String token = authService.register(request);
-        return ResponseEntity.ok(Map.of("token", token));
+        authService.register(request);
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jWTService.generateToken(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jWTService.generateToken(authentication);
 
-            return ResponseEntity.ok(Map.of("token", token));
-        } catch (AuthenticationException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-        }
+        return ResponseEntity.ok(Map.of("token", token));
     }
 }

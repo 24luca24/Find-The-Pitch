@@ -18,7 +18,7 @@ class AddFieldScreen extends StatefulWidget {
 class _AddFieldScreenState extends State<AddFieldScreen> {
 
   //Holds ID of created field from backend. Useful to store than images because they need a field reference
-  String? _createdFieldId;
+  int? _createdFieldId;
 
   //Handle page management (Add field has 2 page, one with mandatory fields, one with optional ones)
   late final PageController _pageController;
@@ -85,7 +85,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
         );
 
         setState(() {
-          _createdFieldId = createdField.id;
+          _createdFieldId = createdField;
         });
 
         return true; //success
@@ -262,7 +262,6 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
         _images.removeAt(index);
       });
     }
-
 
   //Function to autocomplete the city form. Gets city suggestion from AuthService.fetchCitySuggestions(query)
   //Syncs the selected value to _cityController

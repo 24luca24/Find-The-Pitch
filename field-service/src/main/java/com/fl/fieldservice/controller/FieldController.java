@@ -34,7 +34,7 @@ public class FieldController {
         this.imageService = imageService;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('PLAYER') or hasRole('OWNER')")
     @PostMapping("/uploadImages")
     public ResponseEntity<?> uploadImages(@RequestParam("images") List<MultipartFile> files, @PathVariable Long fieldId) throws IOException {
         try {
@@ -61,7 +61,7 @@ public class FieldController {
     }
 
     //API call to create a field (only mandatory fields)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('PLAYER') or hasRole('OWNER')")
     @PostMapping("/createField")
     public ResponseEntity<Map<String, Object>> createField(@RequestBody FieldRequestDto fieldDTO) {
         System.out.println("fieldDTO = " + fieldDTO);
@@ -80,7 +80,7 @@ public class FieldController {
     }
 
     //API call to update a field (only optional fields)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('PLAYER') or hasRole('OWNER')")
     @PutMapping("/updateField/{id}")
     public ResponseEntity<?> updateField(
             @PathVariable Long id,

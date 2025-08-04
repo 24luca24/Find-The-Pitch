@@ -16,9 +16,9 @@ import java.util.Map;
 
 //class that:
 /*
-    -Generate JWT tokens when a user logs in or registers
-    -Validate JWT tokens when users send requests with tokens
-    -Extract information from a token
+    - Generate JWT tokens when a user logs in or registers
+    - Validate JWT tokens when users send requests with tokens
+    - Extract information from a token
  */
 
 @Service
@@ -27,26 +27,17 @@ public class JWTService {
     @Value("${jwt.secret}") //inject value from application properties
     private String  secretKey;
 
-    //Create a JWT token for a given user (Registration)
-    public String generateToken(User user) {
+    //Create JWT token using role and email
+    public String generateToken(Authentication auth) {
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        User user = userDetails.getUser();
+
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role",  user.getRole().toString());
+        claims.put("role", user.getRole().toString()); // e.g., "ROLE_ADMIN"
         claims.put("email", user.getEmail());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    //Create a JWT token for a given user (Login)
-    public String generateToken(Authentication auth) {
-        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-        User user = userDetails.getUser();
-        return Jwts.builder()
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day

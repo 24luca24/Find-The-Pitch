@@ -17,6 +17,7 @@ class AuthService {
     required String email,
     required String password,
     required String city,
+    required String role,
   }) async {
     final url = Uri.parse("$authURL/api/auth/register");
     try {
@@ -28,7 +29,7 @@ class AuthService {
           "email": email,
           "password": password,
           "city": city,
-          "role": "user",
+          "role": role.toUpperCase(),
         }),
       );
       logger.i('Response status: ${response.statusCode}');

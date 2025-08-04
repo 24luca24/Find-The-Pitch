@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/role_type.dart';
 import 'package:frontend/services/auth_service.dart';
 import '../design/registration_design.dart';
 import 'login_screen.dart';
@@ -12,75 +13,70 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-
   final _formKey = GlobalKey<FormState>();
 
-  //Input controllers
+  // Input controllers
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _cityController = TextEditingController();
+  RoleType? _roleType;
 
-  //Declaring individual keys for validate fields
+  // Field keys
   final _usernameFieldKey = GlobalKey<FormFieldState>();
   final _emailFieldKey = GlobalKey<FormFieldState>();
   final _passwordFieldKey = GlobalKey<FormFieldState>();
   final _cityFieldKey = GlobalKey<FormFieldState>();
+  final _roleFieldKey = GlobalKey<FormFieldState<RoleType>>();
 
-  //Declaring focus node to trigger error after focus switch from a field to another
+  // Focus nodes
   final _usernameFocus = FocusNode();
   final _emailFocus = FocusNode();
   final _passwordFocus = FocusNode();
   final _cityFocus = FocusNode();
 
-  //late means: I promise this variable will be initialized before I use it.
+  // Autocomplete city controller
   late final TextEditingController _autocompleteCityController;
 
-  //Toggle loading spinner/UI state
+  // UI state
   bool isLoading = false;
 
-  //Store the results of the async username/mail check
+  // Validation states
   bool usernameAvailable = true;
   bool emailAvailable = true;
 
-  //Delay used to fire the username check to reduce API calls while typing
   Timer? _debounce;
 
-  //Field controls
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) return 'Username required';
+    if (!usernameAvailable) return 'Username already taken';
+    return null;
+  }
 
-    //Check if field username is null or contains a name already in the db
-    String? _validateUsername(String? value) {
-      if (value == null || value.isEmpty) return 'Username required';
-      if (!usernameAvailable) return 'Username already taken';
-      return null;
-    }
+  String? _validateEmail(String? email) {
+    if (email == null || email.isEmpty) return 'Email required';
+    final regex = RegExp(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+    if (!regex.hasMatch(email)) return 'Invalid email format';
+    if (!emailAvailable) return 'Email already in use';
+    return null;
+  }
 
-    String? _validateEmail(String? email) {
-      if (email == null || email.isEmpty) return 'Email required';
+  String? _validatePassword(String? password) {
+    if (password == null || password.isEmpty) return 'Password required';
+    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$');
+    return (regex.hasMatch(password)) ? null : 'Min 8 chars, 1 uppercase, 1 special char';
+  }
 
-      final regex = RegExp(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+  String? _validateCity(String? city) {
+    if (city == null || city.isEmpty) return 'City required';
+    return null;
+  }
 
-      if (!regex.hasMatch(email)) return 'Invalid email format';
-      if (!emailAvailable) return 'Email already in use';
+  String? _validateRole(RoleType? role) {
+    if (role == null) return 'Role required';
+    return null;
+  }
 
-      return null;
-    }
-
-  //Check if password contain 8 character, 1 Uppercase, 1 special character
-    String? _validatePassword(String? password) {
-      if (password == null || password.isEmpty) return 'Password required';
-      final regex = RegExp(r'^(?=.*[A-Z])(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$');
-      return (regex.hasMatch(password)) ? null :'Min 8 chars, 1 uppercase, 1 special char';
-    }
-
-    //Only check if there is something in the controller since city are preloaded from db
-    String? _validateCity(String? value) {
-      if (value == null || value.isEmpty) return 'City required';
-      return null;
-    }
-
-  //Function to be called on the register button. Check if all field are valid,
-  //call the Authservice -> the API and send to the db the data.
   void _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() => isLoading = true);
@@ -91,9 +87,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
           city: _cityController.text.trim(),
+          role: _roleType!.name.toUpperCase(), // Ensure it's not null due to form validation
         );
 
-        if(!mounted) return;
+        if (!mounted) return;
 
         if (success) {
           Navigator.pushReplacement(
@@ -102,86 +99,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
         }
       } catch (e) {
-        if(!mounted) return;
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
         );
       } finally {
-        if (mounted) {
-          setState(() => isLoading = false);
-        }
+        if (mounted) setState(() => isLoading = false);
       }
     }
   }
 
-  //Initialize autocomplete field, timer and error state
   @override
   void initState() {
     super.initState();
+
     _autocompleteCityController = TextEditingController(text: _cityController.text);
-    _autocompleteCityController.addListener((){
+    _autocompleteCityController.addListener(() {
       _cityController.text = _autocompleteCityController.text;
     });
 
-    //Attach debounce to username text changes (this run every 500 millisecond)
-    // _usernameController.addListener(() {
-    //   if (_debounce?.isActive ?? false) _debounce!.cancel();
-    //   _debounce = Timer(const Duration(milliseconds: 500), () {
-    //     _checkUsernameAsync();
-    //   });
-    // });
-
-    //This run after the focus change
     _usernameFocus.addListener(() {
       if (!_usernameFocus.hasFocus) {
-        () async {
-          await _checkUsernameAsync();
-        }();
+        _checkUsernameAsync();
       }
     });
 
-    _emailFocus.addListener((){
-      if(!_emailFocus.hasFocus) {
-         () async {
-           await _checkEmailAsync();
-         } ();
+    _emailFocus.addListener(() {
+      if (!_emailFocus.hasFocus) {
+        _checkEmailAsync();
       }
     });
 
-    _passwordFocus.addListener((){
-      if(!_passwordFocus.hasFocus) {
-      _passwordFieldKey.currentState?.validate();
+    _passwordFocus.addListener(() {
+      if (!_passwordFocus.hasFocus) {
+        _passwordFieldKey.currentState?.validate();
       }
     });
 
-    _cityFocus.addListener((){
-      if(!_cityFocus.hasFocus) {
+    _cityFocus.addListener(() {
+      if (!_cityFocus.hasFocus) {
         _cityFieldKey.currentState?.validate();
       }
     });
   }
 
-  //Check if username already exist in the db
   Future<void> _checkUsernameAsync() async {
     final name = _usernameController.text.trim();
     if (name.isNotEmpty) {
       try {
         final available = await AuthService.checkUsernameAvailable(name);
         if (mounted) {
-          usernameAvailable = available;
-
-          //Trigger form validation to show errors
           setState(() {
+            usernameAvailable = available;
             _usernameFieldKey.currentState?.validate();
           });
         }
       } catch (e) {
         if (mounted) {
           setState(() {
-            usernameAvailable = false; //Assume non-available if API fails
-          });
-
-          setState(() {
+            usernameAvailable = false;
             _usernameFieldKey.currentState?.validate();
           });
         }
@@ -189,16 +165,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  //Check if email already exist in the db
   Future<void> _checkEmailAsync() async {
     final email = _emailController.text.trim();
     if (email.isNotEmpty) {
       try {
         final available = await AuthService.checkEmailAvailable(email);
         if (mounted) {
-          emailAvailable = available;
-
           setState(() {
+            emailAvailable = available;
             _emailFieldKey.currentState?.validate();
           });
         }
@@ -206,9 +180,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (mounted) {
           setState(() {
             emailAvailable = false;
-          });
-
-          setState(() {
             _emailFieldKey.currentState?.validate();
           });
         }
@@ -216,7 +187,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  //Widget to create autocomplete city field
   Widget _buildAutocompleteCityField() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -225,10 +195,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         children: [
           const SizedBox(
             width: 90,
-            child: Text(
-              "City:",
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
+            child: Text("City:", style: TextStyle(color: Colors.white, fontSize: 16)),
           ),
           Expanded(
             child: Autocomplete<String>(
@@ -242,7 +209,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _cityController.text = selection;
               },
               fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-                // One-way sync: _cityController updates from user edits
                 if (textEditingController.text != _cityController.text) {
                   textEditingController.text = _cityController.text;
                   textEditingController.selection = TextSelection.fromPosition(
@@ -263,7 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.black.withValues(alpha: 0.3),
+                    fillColor: Colors.black.withOpacity(0.3),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -277,7 +243,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  //Prevent memory leak
+  void onRoleChanged(RoleType? role) {
+    setState(() => _roleType = role);
+    _roleFieldKey.currentState?.validate();
+  }
+
+  String? roleValidator(RoleType? value) {
+    return _validateRole(value);
+  }
+
+  Widget _buildRoleDropdown() {
+    return DropdownButtonFormField<RoleType>(
+      key: _roleFieldKey,
+      value: _roleType,
+      dropdownColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: "Role",
+        labelStyle: const TextStyle(color: Colors.white),
+        filled: true,
+        fillColor: Colors.black.withOpacity(0.3),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      items: RoleType.values.map((role) {
+        return DropdownMenuItem<RoleType>(
+          value: role,
+          child: Text(role.name, style: const TextStyle(color: Colors.white)),
+        );
+      }).toList(),
+      onChanged: onRoleChanged,
+      validator: roleValidator,
+    );
+  }
+
   @override
   void dispose() {
     _autocompleteCityController.dispose();
@@ -289,7 +286,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  //Handles design, classing the design class constructor
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -302,6 +298,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           emailController: _emailController,
           passwordController: _passwordController,
           cityController: _cityController,
+          role: _roleType,
           isLoading: isLoading,
           customCityField: _buildAutocompleteCityField(),
           usernameFocusNode: _usernameFocus,
@@ -316,6 +313,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           passwordFieldKey: _passwordFieldKey,
           emailFieldKey: _emailFieldKey,
           cityFieldKey: _cityFieldKey,
+          roleFieldKey: _roleFieldKey,
+          roleValidator: _validateRole,
+          onRoleChanged: onRoleChanged,
+
         ),
       ),
     );

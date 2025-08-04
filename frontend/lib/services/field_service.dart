@@ -6,7 +6,6 @@ import 'package:frontend/constants/area_type.dart';
 import 'package:frontend/constants/pitch_type.dart';
 import 'package:frontend/constants/surface_type.dart';
 import 'package:frontend/services/auth_service.dart';
-import 'package:frontend/services/secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -104,7 +103,7 @@ class FieldService {
   }
 
   static Future<bool> updateField({
-    required String id,
+    required int id,
     required String description,
     required String website,
     required bool canShower,
@@ -130,8 +129,8 @@ class FieldService {
       'lunchBrakeEnd': formatTimeOfDay(lunchBrakeEnd),
       'closingTime': formatTimeOfDay(closingTime),
       'price': price,
-      'surfaceType': surfaceType?.name,
-      'areaType': areaType?.name,
+      'surfaceType': surfaceType?.name.toUpperCase(),
+      'areaType': areaType?.name.toUpperCase(),
     };
 
     final headers = await AuthService.getAuthHeaders();

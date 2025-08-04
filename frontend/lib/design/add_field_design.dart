@@ -78,7 +78,7 @@ class MandatoryFieldsForm extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildLabeledField("Name", nameController, validator: validatorName),
-                    customCityField ?? _buildLabeledField("City", autocompleteCityController),
+                    customCityField ?? _buildLabeledField("City", autocompleteCityController, validator: validatorAutocompletionCity),
                     _buildLabeledField("Address", addressController, validator: validatorAddress),
                     _buildLabeledField("Phone", phoneController, validator: validatorPhone),
                     _buildLabeledField("Email", mailController, validator: validatorMail),

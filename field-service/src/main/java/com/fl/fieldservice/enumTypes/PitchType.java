@@ -3,7 +3,7 @@ package com.fl.fieldservice.enumTypes;
 public enum PitchType {
     FOOTBALL,
     BASKETBALL,
-    BEACH_VOLLEY,
+    BEACHVOLLEY,
     TENNIS,
     PADEL
 }
