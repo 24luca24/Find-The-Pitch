@@ -408,6 +408,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
             onAreaTypeChanged: _handleAreaChanged,
             onAddImage: _handleAddImage,
             onBackPressed: _previousPage,
+            onSave: _submitOptional,
           ),
         ],
       ),

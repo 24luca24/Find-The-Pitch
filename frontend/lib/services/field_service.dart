@@ -136,7 +136,7 @@ class FieldService {
     final headers = await AuthService.getAuthHeaders();
 
     final response = await http.put(
-      Uri.parse('$fieldURL/api/fields/$id/updateField'),
+      Uri.parse('$fieldURL/api/fields/updateField/$id'),
       headers: headers,
       body: jsonEncode(body),
     );

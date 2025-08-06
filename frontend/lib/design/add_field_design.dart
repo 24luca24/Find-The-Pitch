@@ -293,6 +293,7 @@ class OptionalFieldsForm extends StatelessWidget {
   final ValueChanged<SurfaceType?> onSurfaceTypeChanged;
   final ValueChanged<AreaType?> onAreaTypeChanged;
   final VoidCallback onAddImage; //for image picker button
+  final Future<void> Function() onSave;
 
   const OptionalFieldsForm({
     super.key,
@@ -321,6 +322,7 @@ class OptionalFieldsForm extends StatelessWidget {
     required this.onAreaTypeChanged,
     required this.onAddImage,
     required this.onBackPressed,
+    required this.onSave,
   });
 
   Future<void> _pickTime(BuildContext context, TimeOfDay? initialTime, ValueChanged<TimeOfDay?> onTimeChanged) async {
@@ -481,13 +483,8 @@ class OptionalFieldsForm extends StatelessWidget {
                   tooltip: 'Back',
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      // Save logic here or callback to parent
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Optional fields saved')),
-                      );
-                    }
+                  onPressed: () async {
+                    await onSave();
                   },
                   child: const Text('Save'),
                 ),
