@@ -43,69 +43,73 @@ class MandatoryFieldsForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Background
-        Opacity(
-          opacity: 0.9,
-          child: Image.asset(
-            ImagePath.backgroundAddField,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Background
+          Opacity(
+            opacity: 0.9,
+            child: Image.asset(
+              ImagePath.backgroundAddField,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
           ),
-        ),
 
-        // Back button
-        Positioned(
-          top: 40,
-          left: 16,
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back, color: Colors.white),
+          // Back button
+          Positioned(
+            top: 40,
+            left: 16,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ),
-        ),
 
-        // Form content
-        Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 450),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildLabeledField("Name", nameController, validator: validatorName),
-                    customCityField ?? _buildLabeledField("City", autocompleteCityController, validator: validatorAutocompletionCity),
-                    _buildLabeledField("Address", addressController, validator: validatorAddress),
-                    _buildLabeledField("Phone", phoneController, validator: validatorPhone),
-                    _buildLabeledField("Email", mailController, validator: validatorMail),
-                    const SizedBox(height: 12),
+          // Form content
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 450),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildLabeledField("Name", nameController, validator: validatorName),
+                      customCityField ?? _buildLabeledField("City", autocompleteCityController, validator: validatorAutocompletionCity),
+                      _buildLabeledField("Address", addressController, validator: validatorAddress),
+                      _buildLabeledField("Phone", phoneController, validator: validatorPhone),
+                      _buildLabeledField("Email", mailController, validator: validatorMail),
+                      const SizedBox(height: 12),
 
-                    _buildDropdown(),
+                      _buildDropdown(),
 
-                    const SizedBox(height: 12),
-                    _buildRadioGroup(),
+                      const SizedBox(height: 12),
+                      _buildRadioGroup(),
 
-                    const SizedBox(height: 24),
-                    PrimaryButton(
-                      text: "Continue",
-                      onPressed: () {
-                        FocusScope.of(context).unfocus(); // Hide keyboard
-                        if (formKey.currentState!.validate()) {
-                          onContinuePressed();
-                        }
-                      },
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      PrimaryButton(
+                        text: "Continue",
+                        onPressed: () {
+                          FocusScope.of(context).unfocus(); // Hide keyboard
+                          if (formKey.currentState!.validate()) {
+                            onContinuePressed();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
