@@ -150,54 +150,75 @@ class _MapScreenState extends State<MapScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
         ],
         onTap: (index) {
-          //TODO: complete index routing
-          if (index == 2) {
-            if(context.read<AuthProvider>().isLoggedIn) {
+          switch (index) {
+            case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddFieldScreen()),
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
               );
-            } else {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text("Login Required"),
-                  content: const Text("You need to be logged in to be able to add a field. Would you like to register or log in now?"),
-                  actions: [
-                    TextButton(
-                      child: const Text("Not Now"),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    TextButton(
-                      child: const Text("Register"),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                          context,
+              break;
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RankScreen()),
+              );
+              break;
+            case 2:
+              if (context.read<AuthProvider>().isLoggedIn) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddFieldScreen()),
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Login Required"),
+                    content: const Text("You need to be logged in to add a field. Would you like to register or log in now?"),
+                    actions: [
+                      TextButton(
+                        child: const Text("Not Now"),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      TextButton(
+                        child: const Text("Register"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
                             MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                        );
-                      },
-                    ),
-                    TextButton(
-                      child: const Text("Login"),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                          );
+                        },
+                      ),
+                      TextButton(
+                        child: const Text("Login"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+              break;
+            case 3:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BookingsScreen()),
               );
-            }
-          } else {
-            setState(() {
-              _selectedIndex = index;
-            });
+              break;
+            case 4:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PersonalAreaScreen()),
+              );
+              break;
           }
-        },
+        }
       ),
     );
   }

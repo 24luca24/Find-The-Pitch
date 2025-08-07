@@ -163,6 +163,34 @@ class AuthService {
     }
   }
 
+  //Get token information
+  static Future<Map<String, dynamic>?> loadUserInfo() async {
+    final token = await SecureStorage.readToken();
+    if (token == null) return null;
+
+    try {
+      final response = await http.get(
+        Uri.parse('$authURL/api/token/accountInfo'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'username': data['username'],
+          'email': data['email'],
+        };
+      } else {
+        logger.e('Failed to load user info: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      logger.e('Exception in loadUserInfo: $e');
+      return null;
+    }
+  }
+
+
   //Centralized authenticated GET request
   static Future<http.Response> authenticatedGet(String path) async {
     final headers = await getAuthHeaders();

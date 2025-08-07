@@ -1,4 +1,5 @@
 
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorage {
@@ -25,4 +26,14 @@ class SecureStorage {
   static Future<void> clearAll() async {
     await _storage.deleteAll();
   }
+
+  static Future<String?> getUsername() async {
+
+  }
+
+  static Future<String?> getEmail() async {
+
+  }
+
+
 }
