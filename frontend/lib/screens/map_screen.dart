@@ -38,6 +38,7 @@ class _MapScreenState extends State<MapScreen> {
     _loadSavedLocation();
   }
 
+  //Get user location function
   Future<void> _getUserLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission = await Geolocator.checkPermission();
@@ -55,12 +56,12 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
       });
-
       //Move the map to the new location
       _mapController.move(_currentLocation, _zoom);
     }
   }
 
+  //Function to save the loaded location
   Future<void> _loadSavedLocation() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     double? lat = preferences.getDouble('latitude');
@@ -99,19 +100,6 @@ class _MapScreenState extends State<MapScreen> {
                     elevation: 0,
                   ),
                   child: const Text('Filter'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[50],
-                    foregroundColor: Colors.green[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text('Add Field'),
                 ),
                 const SizedBox(width: 8),
                 Expanded(

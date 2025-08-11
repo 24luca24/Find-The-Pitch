@@ -91,7 +91,7 @@ class MapDesign extends StatelessWidget {
     return FloatingActionButton(
       heroTag: heroTag,
       mini: true,
-      backgroundColor: Colors.green.shade100,
+      backgroundColor: Colors.white,
       foregroundColor: Colors.black,
       onPressed: onPressed,
       child: Icon(icon),
