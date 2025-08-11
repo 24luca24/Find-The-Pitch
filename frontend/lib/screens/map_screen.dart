@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/screens/personal_area_screen.dart';
+import 'package:frontend/screens/rank_screen.dart';
 import 'package:frontend/screens/register_screen.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/screens/add_field_screen.dart';
 
 import '../design/map_design.dart';
+import 'booking_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -154,7 +157,7 @@ class _MapScreenState extends State<MapScreen> {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                MaterialPageRoute(builder: (_) => const MapScreen()),
               );
               break;
             case 1:
@@ -208,7 +211,7 @@ class _MapScreenState extends State<MapScreen> {
             case 3:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const BookingsScreen()),
+                MaterialPageRoute(builder: (_) => const BookingScreen()),
               );
               break;
             case 4:
