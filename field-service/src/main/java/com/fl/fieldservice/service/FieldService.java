@@ -6,6 +6,8 @@ import com.fl.fieldservice.entity.Field;
 import com.fl.fieldservice.repository.FieldRepository;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 
 //Handle logic, like verifying if a field is already saved when trying to save it
@@ -44,5 +46,20 @@ public class FieldService {
     public void updateField(Long id, FieldUpdateDto dto) {
         Field updated = fieldRepository.updateField(id, dto)
                 .orElseThrow(() -> new RuntimeException("Field not found"));
+    }
+
+    //To be used when I load the map screen (See frontend package)
+    public Optional<List<Field>> findAllByCity(String city) {
+        return fieldRepository.findAllByCity(city);
+    }
+
+    //To be used in the filter
+    public Optional<List<Field>> findByNameStartingWith(String fieldName) {
+        return fieldRepository.findByNameStartingWith(fieldName);
+    }
+
+    //To be used after creation of a field. I want the map screen to show that specific field
+    public Optional<Field> findOneByName(String name) {
+        return fieldRepository.findOneByName(name);
     }
 }

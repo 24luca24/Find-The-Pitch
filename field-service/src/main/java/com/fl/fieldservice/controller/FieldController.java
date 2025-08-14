@@ -14,9 +14,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 //What your mobile app or frontend talks to via HTTP
 //Uses the Service layer to return data
@@ -96,5 +99,31 @@ public class FieldController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Unexpected error: " + ex.getMessage()));
         }
+    }
+
+    //Find all fields inside a city if present, otherwise return an empty list
+    @PreAuthorize("hasRole('PLAYER') or hasRole('OWNER')")
+    @GetMapping("/findAllByCity")
+    public ResponseEntity<List<Field>> findAllByCity(
+            @RequestParam("city") String city) {
+        Optional<List<Field>> fields = fieldService.findAllByCity(city);
+        return ResponseEntity.ok(fields.orElse(new ArrayList<>()));
+    }
+
+    //Find all fields inside a starting with a prefix if present, otherwise return an empty list
+    @GetMapping("/findByNameStartingWith")
+    public ResponseEntity<List<Field>> findByNameStartingWith(
+            @RequestParam("fieldName") String fieldName) {
+        Optional<List<Field>> fields = fieldService.findByNameStartingWith(fieldName);
+        return ResponseEntity.ok(fields.orElse(new ArrayList<>()));
+    }
+
+    //Find the field yet created
+    @PreAuthorize("hasRole('PLAYER') or hasRole('OWNER')")
+    @GetMapping("/findOneByName")
+    public ResponseEntity<Field> findOneByName(
+            @RequestParam("fieldName") String fieldName) {
+        Optional<Field> field = fieldService.findOneByName(fieldName);
+        return field.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
