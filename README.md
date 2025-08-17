@@ -59,3 +59,11 @@ The backend services are developed using **Spring Boot**.
    ```bash
    cd frontend
    ./startAll.sh
+
+## How application is looking (not completed yet)
+<img src="./images/landingPage.png" alt="Logo" width="200"/>
+<img src="./images/registration.png" alt="Logo" width="200"/>
+<img src="./images/login.png" alt="Logo" width="200"/>
+<img src="./images/homePage.png" alt="Logo" width="200"/>
+
+
